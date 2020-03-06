@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Get this file's location
+DIR="$( cd "$( dirname $( readlink -f "${BASH_SOURCE[0]}" ) )" && pwd )"
+
+/usr/bin/nvidia-container-runtime-hook -config="$DIR/nvidia-container-runtime-hook-config.toml" "$@"
+

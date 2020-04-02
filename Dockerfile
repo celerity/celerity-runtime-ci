@@ -45,7 +45,11 @@ RUN apt install -y clang-tidy-8 clang-format-8
 RUN mkdir /home/cirunner/actions-runner
 WORKDIR /home/cirunner/actions-runner
 
-RUN curl -O -L https://github.com/actions/runner/releases/download/v2.165.2/actions-runner-linux-x64-2.165.2.tar.gz && \
+# Action runner update script uses `ping` which does not
+# come with this Ubuntu base image...
+RUN apt install -y iputils-ping
+
+RUN curl -O -L https://github.com/actions/runner/releases/download/v2.168.0/actions-runner-linux-x64-2.168.0.tar.gz && \
 	tar -xf *.tar.gz
 
 RUN bin/installdependencies.sh

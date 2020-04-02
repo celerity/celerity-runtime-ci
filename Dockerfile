@@ -17,7 +17,7 @@ RUN curl -O -L https://download.open-mpi.org/release/open-mpi/v4.0/openmpi-4.0.2
 	make -j$(nproc) install
 
 # Build hipSYCL
-ARG hipSYCL_VERSION=266d45ed
+ARG hipSYCL_VERSION=5f30bc1f
 RUN git clone https://github.com/illuhad/hipSYCL \
 	--branch=master --single-branch --shallow-since=2020-02-01 \
 	--recurse-submodules /tmp/hipSYCL && \

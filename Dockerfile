@@ -34,8 +34,12 @@ ENV PATH=/usr/local/cuda/bin:$PATH
 RUN cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/sycl/hipSYCL -DWITH_CPU_BACKEND=OFF -WIDTH_GPU_BACKEND=ON /tmp/hipSYCL && \
 	ninja install
 
+# Install OpenCL (taken from nvidia/opencl Docker images)
+RUN apt install -y --no-install-recommends ocl-icd-libopencl1 ocl-icd-opencl-dev
+RUN mkdir -p /etc/OpenCL/vendors && \
+	echo "libnvidia-opencl.so.1" > /etc/OpenCL/vendors/nvidia.icd
+
 # Add ComputeCpp
-RUN apt install -y nvidia-compute-utils-440 nvidia-opencl-dev
 COPY --chown=cirunner:cirunner computecpp /computecpp
 
 # Install Celerity dependencies

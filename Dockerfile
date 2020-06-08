@@ -3,10 +3,17 @@
 FROM nvidia/cuda:10.0-devel-ubuntu18.04
 
 RUN apt update && \
-	apt install -y software-properties-common curl clang-8 libclang-8-dev cmake ninja-build python3
+	apt install -y software-properties-common curl clang-8 libclang-8-dev ninja-build python3
 # GitHub runner wants git >= 2.18, but Ubuntu 18.04 ships 2.17
 RUN apt-add-repository -y ppa:git-core/ppa && \
 	apt install -y git
+
+# We require CMake >= 3.13
+RUN curl https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | \
+	gpg --dearmor - | \
+	tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null && \
+	apt-add-repository -y 'deb https://apt.kitware.com/ubuntu/ bionic main' && \
+	apt install -y cmake
 
 RUN useradd --create-home --shell /bin/bash --uid 1337 cirunner
 

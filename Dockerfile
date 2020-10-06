@@ -27,9 +27,9 @@ RUN curl -O -L https://download.open-mpi.org/release/open-mpi/v4.0/openmpi-4.0.2
 	make -j$(nproc) install
 
 # Build hipSYCL
-ARG hipSYCL_VERSION=5f30bc1f
+ARG hipSYCL_VERSION=47efe470
 RUN git clone https://github.com/illuhad/hipSYCL \
-	--branch=master --single-branch --shallow-since=2020-02-01 \
+	--branch=develop --single-branch --shallow-since=2020-08-01 \
 	--recurse-submodules /tmp/hipSYCL && \
 	cd /tmp/hipSYCL && \
 	git checkout $hipSYCL_VERSION && \
@@ -50,7 +50,7 @@ RUN mkdir -p /etc/OpenCL/vendors && \
 COPY --chown=cirunner:cirunner computecpp /computecpp
 
 # Install Celerity dependencies
-RUN apt install -y libboost-dev libboost-graph-dev
+RUN apt install -y libboost-dev libboost-graph-dev libboost-atomic-dev libboost-container-dev
 
 # Install tools
 RUN apt install -y clang-tidy-8 clang-format-8
@@ -63,7 +63,7 @@ WORKDIR /home/cirunner/actions-runner
 # come with this Ubuntu base image...
 RUN apt install -y iputils-ping
 
-RUN curl -O -L https://github.com/actions/runner/releases/download/v2.263.0/actions-runner-linux-x64-2.263.0.tar.gz && \
+RUN curl -O -L https://github.com/actions/runner/releases/download/v2.273.5/actions-runner-linux-x64-2.273.5.tar.gz && \
 	tar -xf *.tar.gz
 
 RUN bin/installdependencies.sh
@@ -72,6 +72,8 @@ RUN chown -R cirunner:cirunner .
 
 USER cirunner
 
+# NOTE: As of docker/dockerfile:1.0-experimental it seems like changing a build secret does not invalidate
+# the cache of this command. To force this step to run again, temporarily add something like "RUN echo foo" above.
 RUN --mount=type=secret,id=token,required,uid=1337 \
 	cd /home/cirunner/actions-runner && \
 	./config.sh --unattended --name dps-gpuc --replace \
@@ -81,5 +83,5 @@ RUN --mount=type=secret,id=token,required,uid=1337 \
 COPY --chown=cirunner:cirunner scripts /scripts
 COPY --chown=cirunner:cirunner data /data
 
-CMD ./run.sh
+CMD ["/scripts/docker-entrypoint.sh", "./run.sh"]
 

@@ -2,7 +2,7 @@
 TIMEOUT=120
 RUNNER_CMD="$@"
 
-$RUNNER_CMD
+./$RUNNER_CMD
 
 # The GitHub Actions Runner updates itself automatically.
 #

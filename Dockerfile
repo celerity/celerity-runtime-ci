@@ -86,5 +86,5 @@ RUN --mount=type=secret,id=token,required,uid=1337 \
 COPY --chown=cirunner:cirunner scripts /scripts
 COPY --chown=cirunner:cirunner data /data
 
-CMD ["/scripts/docker-entrypoint.sh", "./run.sh"]
+CMD ["/scripts/docker-entrypoint.sh", "run.sh"]
 

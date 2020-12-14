@@ -26,10 +26,13 @@ RUN curl -O -L https://download.open-mpi.org/release/open-mpi/v4.0/openmpi-4.0.2
 	./configure && \
 	make -j$(nproc) install
 
+# Install hipSYCL dependencies
+RUN apt install -y libboost-dev libboost-context-dev libboost-fiber-dev
+
 # Build hipSYCL
-ARG hipSYCL_VERSION=47efe470
+ARG hipSYCL_VERSION=v0.9.0
 RUN git clone https://github.com/illuhad/hipSYCL \
-	--branch=develop --single-branch --shallow-since=2020-08-01 \
+	--branch=develop --single-branch --shallow-since=2020-12-09 \
 	--recurse-submodules /tmp/hipSYCL && \
 	cd /tmp/hipSYCL && \
 	git checkout $hipSYCL_VERSION && \

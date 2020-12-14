@@ -21,7 +21,7 @@ fi
 
 if [[ $SYCL_IMPL = "hipSYCL" ]]; then
 	cmake -G Ninja $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
-		-DCMAKE_PREFIX_PATH="/sycl/hipSYCL/lib" \
+		-DCMAKE_PREFIX_PATH="/sycl/hipSYCL/lib/cmake" \
 		-DHIPSYCL_PLATFORM=cuda -DHIPSYCL_GPU_ARCH=sm_75
 	ninja
 fi

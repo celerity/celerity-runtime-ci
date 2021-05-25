@@ -22,15 +22,13 @@ fi
 if [[ $SYCL_IMPL = "hipSYCL" ]]; then
 	cmake -G Ninja $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
 		-DCMAKE_PREFIX_PATH="/sycl/hipSYCL/lib/cmake" \
-		-DHIPSYCL_PLATFORM=cuda -DHIPSYCL_GPU_ARCH=sm_75
+		-DHIPSYCL_TARGETS="cuda:sm_75"
 	ninja
 fi
 
 if [[ $SYCL_IMPL = "ComputeCpp" ]]; then
 	cmake -G Ninja $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
-		-DComputeCpp_DIR="/computecpp" -DCOMPUTECPP_BITCODE="ptx64" \
-		-DCOMPUTECPP_USER_FLAGS="-fno-addrsig -no-serial-memop -Wno-sycl-undef-func" \
-		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON # Required for clang-tidy
+		-DComputeCpp_DIR="/sycl/computecpp"
 	ninja
 fi
 

@@ -11,20 +11,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: ["intel", "nvidia"] # This selects the runner that builds the image
-        implementation: ["dpc++", "hipsycl"]
-        version: ["HEAD"]
         include:
-          - implementation: "dpc++"
-            version: "sycl-nightly/20210803"
-          - implementation: "hipsycl"
-            version: "v0.9.1"
-        exclude:
-          - platform: "intel"
-            implementation: "hipsycl"
-          - platform: "nvidia"
-            implementation: "computecpp"
+          - sycl-version: "computecpp:2.6.0"
+            platform: "intel"
+          - sycl-version: "dpcpp:HEAD"
+            platform: "intel"
+          - sycl-version: "dpcpp:7735139b"
+            platform: "intel"
+          - sycl-version: "hipsycl:HEAD"
+            platform: "nvidia"
+          - sycl-version: "hipsycl:v0.9.1"
+            platform: "nvidia"
     steps:
       - uses: actions/checkout@v2
       - name: Build Docker container for SYCL implementation
-        run: bash ./docker/build-image.sh ${{ matrix.implementation }} ${{ matrix.version }}
+        run: bash ./docker/build-image.sh ${{ matrix.sycl-version }}

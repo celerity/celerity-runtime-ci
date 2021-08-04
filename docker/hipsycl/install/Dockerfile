@@ -8,14 +8,17 @@ FROM nvidia/cuda:11.3.0-devel-ubuntu20.04
 # manually create this file.
 RUN echo "CUDA Version 11.3.0" > /usr/local/cuda/version.txt
 
-FROM ubuntu:20.04
-
 ARG DEBIAN_FRONTEND=noninteractive 
 RUN apt update \
     && apt full-upgrade -y \
-    && apt install -y --no-install-recommends build-essential cmake python3 clang-10 libboost-all-dev
+    && apt install -y --no-install-recommends build-essential cmake python3 \
+        clang-10 ccache libboost-all-dev libopenmpi-dev openmpi-bin libomp-10-dev \
+    && update-alternatives --install /usr/bin/clang clang /usr/bin/clang-10 20 \
+        --slave /usr/bin/clang++ clang++ /usr/bin/clang++-10
 
 COPY --chown=root:root VERSION /VERSION
 COPY --chown=root:root opt/hipsycl /opt/hipsycl
+COPY --chown=root:root build-celerity.sh /root/build-celerity.sh
+
 ENV PATH="/opt/hipsycl/bin:${PATH}"
 

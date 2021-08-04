@@ -12,5 +12,6 @@ cmake /src -B /build \
     -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
     -DCMAKE_C_COMPILER_LAUNCHER=ccache
 
-cmake --build /build -j16 --target install
+N_CORES=$(getconf _NPROCESSORS_ONLN)
+cmake --build /build -j$N_CORES --target install
 

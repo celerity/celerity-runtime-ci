@@ -12,5 +12,7 @@ cmake /src/llvm -B /build \
     -DCMAKE_C_COMPILER_LAUNCHER=ccache
 
 rm -rf /opt/dpc++
-cmake --build /build -j16 --target install
+
+N_CORES=$(getconf _NPROCESSORS_ONLN)
+cmake --build /build -j$N_CORES --target install
 

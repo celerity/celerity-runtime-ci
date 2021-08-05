@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -xe
+set -e
 
 export CCACHE_DIR=/ccache
 

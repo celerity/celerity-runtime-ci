@@ -26,4 +26,4 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build Docker container for SYCL implementation
-        run: bash ./docker/build-image.sh ${{ matrix.sycl-version }}
+        run: bash ./docker/build.sh ${{ matrix.sycl-version }}

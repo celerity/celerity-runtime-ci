@@ -8,12 +8,14 @@ FROM nvidia/cuda:11.3.0-devel-ubuntu20.04
 # manually create this file.
 RUN echo "CUDA Version 11.3.0" > /usr/local/cuda/version.txt
 
-COPY install-system.sh /root/install-system.sh
+COPY --chown=root:root common/install-system.sh /root/install-system.sh
 RUN bash /root/install-system.sh clang-10 libclang-10-dev llvm-10-dev cmake ccache \
 		libboost-context-dev libboost-fiber-dev
 
+COPY --chown=root:root common/build-with-cmake.sh /home/user/build-with-cmake.sh
 COPY --chown=root:root build-hipsycl.sh /home/user/build-hipsycl.sh
 
 USER user
+ENV CCACHE_DIR=/ccache
 CMD sh /home/user/build-hipsycl.sh
 

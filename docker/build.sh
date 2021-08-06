@@ -16,6 +16,7 @@ while true; do
     case "$1" in
         -f | --force) FORCE=yes; shift;;
         --) shift; break;;
+		*) echo "Unexpected argument \"$1\"" >&2; usage;;
     esac
 done
 
@@ -68,7 +69,7 @@ build-from-source() {
     CCACHE_DIR="$HOME/celerity-ccache/build/$LIBRARY"
     mkdir -p "$CCACHE_DIR"
 
-    cp ../common/install-system.sh build
+    cp -r ../common build
     docker build build --tag "$BUILD_IMAGE_NAME:latest"
     docker run \
         --mount "type=bind,src=$(pwd)/src,dst=/src,ro=true" \
@@ -76,7 +77,7 @@ build-from-source() {
         --mount "type=bind,src=$(pwd)/install/opt,dst=/opt" \
         "$BUILD_IMAGE_NAME:latest"
 
-    cp ../common/install-system.sh install
+    cp -r ../common install
     echo "$VERSION" > install/VERSION
     docker build install --tag "$COMMIT_TAG" --tag "$GIT_REF_TAG"
 }
@@ -107,7 +108,7 @@ build-from-distribution() {
     mv "$PACKAGE_NAME" "$LIBRARY"
     cd ../..
 
-    cp ../common/install-system.sh install
+    cp -r ../common install
     echo "$VERSION" > install/VERSION
     docker build install --tag "$SYMBOLIC_TAG"
 }

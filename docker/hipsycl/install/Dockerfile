@@ -8,16 +8,16 @@ FROM nvidia/cuda:11.3.0-devel-ubuntu20.04
 # manually create this file.
 RUN echo "CUDA Version 11.3.0" > /usr/local/cuda/version.txt
 
-COPY install-system.sh /root/install-system.sh
+COPY --chown=root:root common/install-system.sh /root/install-system.sh
 RUN bash /root/install-system.sh cmake clang-10 ccache libopenmpi-dev openmpi-bin \
 		libomp-10-dev libhdf5-openmpi-103 libhdf5-openmpi-dev pkg-config \
 		libboost-context-dev libboost-fiber-dev
 
-
 COPY --chown=root:root VERSION /VERSION
 COPY --chown=root:root opt/hipsycl /opt/hipsycl
+COPY --chown=root:root common/build-with-cmake.sh /home/user/build-with-cmake.sh
 COPY --chown=root:root build-celerity.sh /home/user/build-celerity.sh
 
-ENV PATH="/opt/hipsycl/bin:${PATH}"
+ENV PATH="/opt/hipsycl/bin:${PATH}" CCACHE_DIR=/ccache
 USER user
 

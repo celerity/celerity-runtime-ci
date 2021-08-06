@@ -25,5 +25,7 @@ jobs:
             platform: "nvidia"
     steps:
       - uses: actions/checkout@v2
+        with:
+          lfs: true
       - name: Build Docker container for SYCL implementation
         run: bash ./docker/build.sh ${{ matrix.sycl-version }}

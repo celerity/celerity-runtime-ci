@@ -75,6 +75,7 @@ build-from-source() {
     cp -r ../common build
     docker build build --tag "$BUILD_IMAGE_NAME:latest"
     docker run \
+        --group-add $(id -g) \
         --mount "type=bind,src=$SRC_DIR,dst=/src,ro=true" \
         --mount "type=bind,src=$CCACHE_DIR,dst=/ccache" \
         --mount "type=bind,src=$(pwd)/install/opt,dst=/opt" \

@@ -25,7 +25,8 @@ if [ $# -ne 2 ]; then usage; fi
 LIBRARY="$1"
 REF="$2"
 
-cd "$(dirname "$0")/$LIBRARY"
+LIB_DIR="$(readlink -f "$(dirname "$0")")/$LIBRARY"
+cd "$LIB_DIR"
 
 build-from-source() {
     GIT_REMOTE="$1"
@@ -33,12 +34,15 @@ build-from-source() {
     rm -rf install/opt
     mkdir -p install/opt
 
-    if [ -e src ]; then
-        cd src
-        git fetch origin
+    SRC_BASE_DIR="$HOME/celerity-src"
+    mkdir -p "$SRC_BASE_DIR"
+    SRC_DIR="$SRC_BASE_DIR/$LIBRARY"
+    if [ -e "$SRC_DIR" ]; then
+        cd "$SRC_DIR"
+        git fetch --all
     else
-        git clone "$GIT_REMOTE" src
-        cd src
+        git clone "$GIT_REMOTE" "$SRC_DIR"
+        cd "$SRC_DIR"
     fi
 
     COMMIT_ID=$(git rev-parse "remotes/origin/$REF" 2>/dev/null) \
@@ -50,8 +54,7 @@ build-from-source() {
     git submodule update --init --recursive
     VERSION="$(git log --format=format:"$LIBRARY $REF @ %H | %ci" -1)"
 
-    cd ..
-
+    cd "$LIB_DIR"
     echo "Building $VERSION"
 
     BUILD_IMAGE_NAME="build/$LIBRARY"
@@ -72,7 +75,7 @@ build-from-source() {
     cp -r ../common build
     docker build build --tag "$BUILD_IMAGE_NAME:latest"
     docker run \
-        --mount "type=bind,src=$(pwd)/src,dst=/src,ro=true" \
+        --mount "type=bind,src=$SRC_DIR,dst=/src,ro=true" \
         --mount "type=bind,src=$CCACHE_DIR,dst=/ccache" \
         --mount "type=bind,src=$(pwd)/install/opt,dst=/opt" \
         "$BUILD_IMAGE_NAME:latest"

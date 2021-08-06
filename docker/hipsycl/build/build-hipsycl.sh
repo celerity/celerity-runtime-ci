@@ -4,7 +4,7 @@ set -e
 
 export CCACHE_DIR=/ccache
 
-cmake /src -B /build \
+cmake /src -B /home/user/build \
     -DCMAKE_PREFIX_PATH=/usr/lib/llvm-10/lib/cmake/llvm \
     -DWITH_CUDA_BACKEND=YES \
     -DCMAKE_INSTALL_PREFIX=/opt/hipsycl \
@@ -13,5 +13,5 @@ cmake /src -B /build \
     -DCMAKE_C_COMPILER_LAUNCHER=ccache
 
 N_CORES=$(getconf _NPROCESSORS_ONLN)
-cmake --build /build -j$N_CORES --target install
+cmake --build /home/user/build -j$N_CORES --target install
 

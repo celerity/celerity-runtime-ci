@@ -12,7 +12,7 @@ BUILD_TYPE="$1"
 
 export CCACHE_DIR=/ccache
 
-cmake /src -B /build \
+cmake /src -B /home/user/build \
     -DCMAKE_PREFIX_PATH="/opt/hipsycl/lib/cmake" \
     -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
     -DHIPSYCL_TARGETS=cuda:sm_75
@@ -22,5 +22,5 @@ cmake /src -B /build \
     # -DCMAKE_C_COMPILER_LAUNCHER=ccache
 
 N_CORES=$(getconf _NPROCESSORS_ONLN)
-cmake --build /build -j$N_CORES
+cmake --build /home/user/build -j$N_CORES
 

@@ -4,7 +4,7 @@ set -e
 
 export CCACHE_DIR=/ccache
 
-cmake /src/llvm -B /build \
+cmake /src/llvm -B /home/user/build \
     -DLLVM_ENABLE_PROJECTS='clang' \
     -DCMAKE_INSTALL_PREFIX=/opt/dpcpp \
     -DCMAKE_BUILD_TYPE=Release \
@@ -14,5 +14,5 @@ cmake /src/llvm -B /build \
 rm -rf /opt/dpcpp
 
 N_CORES=$(getconf _NPROCESSORS_ONLN)
-cmake --build /build -j$N_CORES --target install
+cmake --build /home/user/build -j$N_CORES --target install
 

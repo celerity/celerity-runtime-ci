@@ -29,7 +29,8 @@ cd "$(dirname "$0")/$LIBRARY"
 build-from-source() {
     GIT_REMOTE="$1"
 
-    mkdir -p install/opt ccache
+    rm -rf install/opt
+    mkdir -p install/opt
 
     if [ -e src ]; then
         cd src
@@ -64,12 +65,18 @@ build-from-source() {
         exit 0
     fi
 
+    CCACHE_DIR="$HOME/celerity-ccache/build/$LIBRARY"
+    mkdir -p "$CCACHE_DIR"
+
+    cp ../common/install-system.sh build
     docker build build --tag "$BUILD_IMAGE_NAME:latest"
     docker run \
         --mount "type=bind,src=$(pwd)/src,dst=/src,ro=true" \
-        --mount "type=bind,src=$(pwd)/ccache,dst=/ccache" \
+        --mount "type=bind,src=$CCACHE_DIR,dst=/ccache" \
         --mount "type=bind,src=$(pwd)/install/opt,dst=/opt" \
         "$BUILD_IMAGE_NAME:latest"
+
+    cp ../common/install-system.sh install
     echo "$VERSION" > install/VERSION
     docker build install --tag "$COMMIT_TAG" --tag "$GIT_REF_TAG"
 }
@@ -100,6 +107,7 @@ build-from-distribution() {
     mv "$PACKAGE_NAME" "$LIBRARY"
     cd ../..
 
+    cp ../common/install-system.sh install
     echo "$VERSION" > install/VERSION
     docker build install --tag "$SYMBOLIC_TAG"
 }

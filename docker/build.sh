@@ -69,8 +69,13 @@ build-from-source() {
         exit 0
     fi
 
+    # Create mounted directories on host and ensure they are group-writable and have setgid.
     CCACHE_DIR="$HOME/celerity-ccache/build/$LIBRARY"
     mkdir -p "$CCACHE_DIR"
+    chmod -R g+ws "$CCACHE_DIR"
+
+    INSTALL_DIR="$(pwd)/install/opt"
+    chmod -R g+ws "$INSTALL_DIR"
 
     cp -r ../common build
     docker build build --tag "$BUILD_IMAGE_NAME:latest"
@@ -78,7 +83,7 @@ build-from-source() {
         --group-add $(id -g) \
         --mount "type=bind,src=$SRC_DIR,dst=/src,ro=true" \
         --mount "type=bind,src=$CCACHE_DIR,dst=/ccache" \
-        --mount "type=bind,src=$(pwd)/install/opt,dst=/opt" \
+        --mount "type=bind,src=$INSTALL_DIR,dst=/opt" \
         "$BUILD_IMAGE_NAME:latest"
 
     cp -r ../common install

@@ -24,6 +24,9 @@ done
 
 N_CORES=$(getconf _NPROCESSORS_ONLN)
 
+# Make all files group-writeable so we can delete them on the host.
+umask -S u=rwx,g=rwx,o=rx
+
 cmake "$SOURCE_DIR" -B /home/user/build "$@" -DCMAKE_BUILD_TYPE="$BUILD_TYPE"
 cmake --build /home/user/build -j$N_CORES ${TARGET+--target "$TARGET"}
 

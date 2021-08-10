@@ -69,23 +69,31 @@ build-from-source() {
         exit 0
     fi
 
-    # Create mounted directories on host and ensure they are group-writable and have setgid.
-    CCACHE_DIR="$HOME/celerity-ccache/build/$LIBRARY"
-    mkdir -p "$CCACHE_DIR"
-    chmod g+ws "$CCACHE_DIR"
+    # We use a named volume for ccache.
+    # The volume is managed by Docker and persists between containers.
+    CCACHE_VOLUME="ccache-$LIBRARY"
 
-    INSTALL_DIR="$(pwd)/install/opt"
-    chmod g+ws "$INSTALL_DIR"
-
+    echo "Creating SYCL build container ($BUILD_IMAGE_NAME:latest)"
     cp -r ../common build
     docker build build --tag "$BUILD_IMAGE_NAME:latest"
-    docker run \
-        --group-add $(id -g) \
+    BUILD_IMAGE_CONTAINER_ID=$(docker create \
         --mount "type=bind,src=$SRC_DIR,dst=/src,ro=true" \
-        --mount "type=bind,src=$CCACHE_DIR,dst=/ccache" \
-        --mount "type=bind,src=$INSTALL_DIR,dst=/opt" \
+        --mount "type=volume,src=$CCACHE_VOLUME,dst=/ccache" \
         "$BUILD_IMAGE_NAME:latest"
+    )
 
+    function cleanup {
+        echo "Removing SYCL build container ($BUILD_IMAGE_CONTAINER_ID)"
+        docker rm "$BUILD_IMAGE_CONTAINER_ID"
+    }
+    trap cleanup EXIT
+
+    echo "Starting SYCL build container ($BUILD_IMAGE_CONTAINER_ID)"
+    docker start --attach "$BUILD_IMAGE_CONTAINER_ID"
+    echo "Copying installation files to host"
+    docker cp "$BUILD_IMAGE_CONTAINER_ID:/opt/$LIBRARY" "$PWD/install/opt"
+
+    echo "Building Celerity build container"
     cp -r ../common install
     echo "$VERSION" > install/VERSION
     docker build install --tag "$COMMIT_TAG" --tag "$GIT_REF_TAG"

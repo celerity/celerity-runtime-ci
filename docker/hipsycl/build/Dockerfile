@@ -15,6 +15,10 @@ RUN bash /root/install-system.sh clang-10 libclang-10-dev llvm-10-dev cmake ccac
 COPY --chown=root:root common/build-with-cmake.sh /home/user/build-with-cmake.sh
 COPY --chown=root:root build-hipsycl.sh /home/user/build-hipsycl.sh
 
+RUN mkdir /ccache && \
+	chown -R user:user /ccache && \
+	mkdir -p /opt/hipsycl && \
+	chown -R user:user /opt/hipsycl
 USER user
 ENV CCACHE_DIR=/ccache
 CMD sh /home/user/build-hipsycl.sh

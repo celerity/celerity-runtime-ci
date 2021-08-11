@@ -3,8 +3,8 @@ name: Nightly Build
 on:
   workflow_dispatch:
   schedule:
-    # TODO: Do once per night
-    - cron: "30 * * * *"
+    # Every night at 03:00 UTC
+    - cron: "0 3 * * *"
 
 jobs:
   build-sycl:

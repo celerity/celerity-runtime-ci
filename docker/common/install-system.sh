@@ -29,5 +29,3 @@ if [[ " $@ " =~ " clang-10 " ]]; then
 		$SLAVES
 fi
 
-useradd -m user
-

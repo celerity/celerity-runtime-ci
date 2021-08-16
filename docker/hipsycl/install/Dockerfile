@@ -8,6 +8,10 @@ FROM nvidia/cuda:11.3.0-devel-ubuntu20.04
 # manually create this file.
 RUN echo "CUDA Version 11.3.0" > /usr/local/cuda/version.txt
 
+ARG UID
+COPY --chown=root:root common/setup-user.sh /root/setup-user.sh
+RUN bash /root/setup-user.sh ${UID}
+
 COPY --chown=root:root common/install-system.sh /root/install-system.sh
 RUN bash /root/install-system.sh cmake clang-10 ccache libopenmpi-dev openmpi-bin \
 		libomp-10-dev libhdf5-openmpi-103 libhdf5-openmpi-dev pkg-config \

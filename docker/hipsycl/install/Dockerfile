@@ -17,8 +17,9 @@ RUN bash /root/install-system.sh cmake clang-10 ccache libopenmpi-dev openmpi-bi
 		libomp-10-dev libhdf5-openmpi-103 libhdf5-openmpi-dev pkg-config \
 		libboost-context-dev libboost-fiber-dev
 
-COPY --chown=root:root VERSION /VERSION
 COPY --chown=root:root opt/hipsycl /opt/hipsycl
+
+COPY --chown=root:root VERSION /VERSION
 COPY --chown=root:root common/build-with-cmake.sh /home/user/build-with-cmake.sh
 COPY --chown=root:root build-celerity.sh /home/user/build-celerity.sh
 COPY --chown=root:root common/data /data

@@ -5,7 +5,7 @@ set -eu
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
 apt-get full-upgrade -y
-apt-get install -y --no-install-recommends build-essential python3 "$@"
+apt-get install -y --no-install-recommends build-essential python3 git "$@"
 
 # Don't keep around apt cache in docker image
 apt-get clean

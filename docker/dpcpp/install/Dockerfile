@@ -12,6 +12,7 @@ COPY --chown=root:root opt/dpcpp /opt/dpcpp
 COPY --chown=root:root VERSION /VERSION
 COPY --chown=root:root common/build-with-cmake.sh /home/user/build-with-cmake.sh
 COPY --chown=root:root build-celerity.sh /home/user/build-celerity.sh
+COPY --chown=root:root common/data /data
 
 RUN mkdir /ccache && chown -R user:user /ccache
 ENV PATH="/opt/dpcpp/bin:${PATH}" CCACHE_DIR=/ccache/dpcpp

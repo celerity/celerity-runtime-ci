@@ -29,3 +29,15 @@ jobs:
           lfs: true
       - name: Build Docker container for SYCL implementation
         run: bash ./docker/build.sh ${{ matrix.sycl-version }}
+
+  build-lint:
+    runs-on: ${{ matrix.platform }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # HACK: We need to ensure the lint container image exists on all runners
+        platform: ["intel", "nvidia"]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Celerity linting container
+        run: bash ./docker/build-lint.sh

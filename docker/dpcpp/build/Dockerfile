@@ -1,5 +1,8 @@
 FROM ubuntu:20.04
 
+COPY --chown=root:root common/setup-user.sh /root/setup-user.sh
+RUN bash /root/setup-user.sh
+
 COPY --chown=root:root common/install-system.sh /root/install-system.sh
 RUN bash /root/install-system.sh git ca-certificates clang-10 cmake ccache 
 

@@ -8,6 +8,9 @@ FROM nvidia/cuda:11.3.0-devel-ubuntu20.04
 # manually create this file.
 RUN echo "CUDA Version 11.3.0" > /usr/local/cuda/version.txt
 
+COPY --chown=root:root common/setup-user.sh /root/setup-user.sh
+RUN bash /root/setup-user.sh
+
 COPY --chown=root:root common/install-system.sh /root/install-system.sh
 RUN bash /root/install-system.sh clang-10 libclang-10-dev llvm-10-dev cmake ccache \
 		libboost-context-dev libboost-fiber-dev

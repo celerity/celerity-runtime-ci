@@ -13,6 +13,7 @@ COPY --chown=root:root build-celerity.sh /home/user/build-celerity.sh
 COPY --chown=root:root opt/computecpp /opt/computecpp
 COPY --chown=root:root VERSION /VERSION
 
-ENV PATH="/opt/computecpp/bin:${PATH}" CCACHE_DIR=/ccache
+RUN mkdir /ccache && chown -R user:user /ccache
+ENV PATH="/opt/computecpp/bin:${PATH}" CCACHE_DIR=/ccache/computecpp
 USER user
 

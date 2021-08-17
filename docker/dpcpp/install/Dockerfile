@@ -11,4 +11,5 @@ COPY --chown=root:root common/build-with-cmake.sh /root/build-with-cmake.sh
 COPY --chown=root:root build-celerity.sh /root/build-celerity.sh
 COPY --chown=root:root common/data /data
 
+ENV OMPI_ALLOW_RUN_AS_ROOT=1 OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 ENV PATH="/opt/dpcpp/bin:${PATH}" CCACHE_DIR=/ccache/dpcpp

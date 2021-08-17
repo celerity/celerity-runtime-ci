@@ -1,140 +1,139 @@
 #!/bin/bash
-set -o errexit -o pipefail -o noclobber -o nounset
 
-function usage {
-	echo "Usage: $0 <name> --intel|nvidia [--enable-hipsycl] [--enable-computecpp]" 2>&1
-	echo -e "\t<name> will be the name of the GitHub actions runner, as displayed in the GitHub UI (for example \"gpuc1\")."
+set -eu -o pipefail
+
+usage() {
+    echo "Usage: $0 [-f|--force] hipsycl|dpcpp[:]<git-ref>" >&2
+    echo "       $0 [-f|--force] computecpp[:]<version>" >&2
+    exit 1
 }
 
-if [[ $# -le 1 ]]; then
-	usage
-	exit 1
-fi
-
-! getopt --test > /dev/null
-if [[ ${PIPESTATUS[0]} -ne 4 ]]; then
-	echo "This script requires the enhanced version of getopt." 2>&1
-	exit 1
-fi
-
-if [[ ! -f token.txt ]]; then
-	echo "Please create file 'token.txt' containing the GitHub runner secret token."
-	exit 1
-fi
-
-LONGOPTIONS="intel,nvidia,enable-hipsycl,enable-computecpp"
-
-! ARGS=$(getopt --options="" --longoptions="$LONGOPTIONS" --name "$0" -- "$@")
-if [[ ${PIPESTATUS[0]} -ne 0 ]]; then
-	exit 1
-fi
+ARGS=$(getopt --options="f" --longoptions="force" --name "$0" -- "$@") || usage
 eval set -- "$ARGS"
 
-PLATFORM=""
-ENABLED_IMPLS=()
-
-function set_platform() {
-	if [[ $PLATFORM != "" ]]; then
-		echo "Platform can be either --intel or --nvidia, not both" 2>&1
-		exit 1
-	fi
-	PLATFORM="$1"
-}
-
+unset FORCE
 while true; do
-	case "$1" in
-		--intel)
-			set_platform "intel"
-			shift
-			;;
-		--nvidia)
-			set_platform "nvidia"
-			shift
-			;;
-		--enable-hipsycl)
-			ENABLED_IMPLS+=("hipSYCL")
-			shift
-			;;
-		--enable-computecpp)
-			ENABLED_IMPLS+=("ComputeCpp")
-			shift
-			;;
-		--)
-			shift
-			break
-			;;
-		*)
-			echo "Unexpected argument" 2>&1
-			exit 1
-			;;
-	esac
+    case "$1" in
+        -f | --force) FORCE=yes; shift;;
+        --) shift; break;;
+        *) echo "Unexpected argument \"$1\"" >&2; usage;;
+    esac
 done
 
-if [[ $# -ne 1 ]]; then
-	usage
-	exit 1
-fi
+if [ $# -eq 1 ]; then set -- ${1//:/ }; fi  # split args on :
+if [ $# -ne 2 ]; then usage; fi
+LIBRARY="$1"
+REF="$2"
 
-RUNNER_NAME="$1"
-echo "Setting GitHub actions runner name to \"$RUNNER_NAME\"."
-RUNNER_LABELS="$PLATFORM"
-echo "Setting GitHub actions runner labels to \"$RUNNER_LABELS\"."
+LIB_DIR="$(readlink -f "$(dirname "$0")")/$LIBRARY"
+cd "$LIB_DIR"
 
-if [[ ${#ENABLED_IMPLS[@]} == 0 ]]; then
-	echo "Please enable at least one SYCL implementation." 2>&1
-	exit 1
-fi
+build-from-source() {
+    GIT_REMOTE="$1"
 
-RENDER_GID=999
-if [[ "$PLATFORM" == "intel" ]]; then
-	! RENDER_GID=$(getent group render | cut -d: -f3)
-	if [[ ${PIPESTATUS[0]} -ne 0 ]]; then
-		echo "Failed to obtain ID of \"render\" group." 2>&1
-		exit 1
-	fi
-	echo "ID of \"render\" group is $RENDER_GID."
-fi
+    rm -rf install/opt
+    mkdir -p install/opt
 
-# We pass a JSON array of enabled implementations into the container,
-# which is then parsed by the GitHub workflow file.
-FS=$'\n' ENABLED_IMPLS=($(sort <<<"${ENABLED_IMPLS[*]}")); unset IFS
-SYCL_IMPLS_JSON=$(printf ",\"%s\"" "${ENABLED_IMPLS[@]}")
-SYCL_IMPLS_JSON="[${SYCL_IMPLS_JSON:1}]"
+    SRC_BASE_DIR="$HOME/celerity-src"
+    mkdir -p "$SRC_BASE_DIR"
+    SRC_DIR="$SRC_BASE_DIR/$LIBRARY"
+    if [ -e "$SRC_DIR" ]; then
+        cd "$SRC_DIR"
+        git fetch --all
+    else
+        git clone "$GIT_REMOTE" "$SRC_DIR"
+        cd "$SRC_DIR"
+    fi
 
-HIPSYCL_BASE_IMAGE="tools"
-COMPUTECPP_BASE_IMAGE="tools"
-ACTIONS_RUNNER_BASE_IMAGE="tools"
+    COMMIT_ID=$(git rev-parse "remotes/origin/$REF" 2>/dev/null) \
+        || COMMIT_ID=$(git rev-parse "tags/$REF" 2>/dev/null) \
+        || COMMIT_ID=$(grep '^[0-9a-f]\+$' <<< "$REF") \
+        || (echo "Error: cannot resolve Git ref $REF" >&2; exit 1)
 
-if [[ ${ENABLED_IMPLS[@]} =~ "hipSYCL" ]]; then
-	echo "Enabling support for hipSYCL."
-	HIPSYCL_BASE_IMAGE="tools"
-	ACTIONS_RUNNER_BASE_IMAGE="hipsycl"
-fi
+    git -c advice.detachedHead=false checkout --force "$COMMIT_ID"
+    git submodule update --init --recursive
+    VERSION="$(git log --format=format:"$LIBRARY $REF @ %H | %ci" -1)"
 
-if [[ ${ENABLED_IMPLS[@]} =~ "ComputeCpp" ]]; then
-	echo "Enabling support for ComputeCpp."
-	if [[ ! -d computecpp || ! -d computecpp/bin ]]; then
-		echo "Please create folder 'computecpp' containing files extracted from ComputeCpp tarball."
-		exit 1
-	fi
-	if [[ ${ENABLED_IMPLS[@]} =~ "hipSYCL" ]]; then
-		COMPUTECPP_BASE_IMAGE="hipsycl"
-	else
-		COMPUTECPP_BASE_IMAGE="tools"
-	fi
-	ACTIONS_RUNNER_BASE_IMAGE="computecpp"
-fi
+    cd "$LIB_DIR"
+    echo "Building $VERSION"
 
-set -x
-DOCKER_BUILDKIT=1 docker build . \
-	--build-arg VENDOR_BASE_IMAGE="$PLATFORM" \
-	--build-arg RENDER_GID="$RENDER_GID" \
-	--build-arg HIPSYCL_BASE_IMAGE="$HIPSYCL_BASE_IMAGE" \
-	--build-arg COMPUTECPP_BASE_IMAGE="$COMPUTECPP_BASE_IMAGE" \
-	--build-arg ACTIONS_RUNNER_BASE_IMAGE="$ACTIONS_RUNNER_BASE_IMAGE" \
-	--build-arg RUNNER_NAME="${RUNNER_NAME}" \
-	--build-arg RUNNER_LABELS="${RUNNER_LABELS}" \
-	--build-arg SYCL_IMPLS_JSON="$SYCL_IMPLS_JSON" \
-	--secret id=token,src=token.txt \
-	--tag celerity-ci-runner:latest
+    BUILD_IMAGE_NAME="build/$LIBRARY"
+    IMAGE_NAME="build/celerity/$LIBRARY"
+    COMMIT_TAG="$IMAGE_NAME:$COMMIT_ID"
+    GIT_REF_TAG="$IMAGE_NAME:$(echo -n "$REF" | tr -sc 'A-Za-z0-9.' '-')"
+
+    EXISTING_IMAGE_ID="$(docker images -f "reference=$COMMIT_TAG" -q)"
+    if [ -n "$EXISTING_IMAGE_ID" ] && ! [ -n "${FORCE+x}" ]; then
+        docker tag "$COMMIT_TAG" "$GIT_REF_TAG"
+        echo "Image $GIT_REF_TAG (aka $EXISTING_IMAGE_ID) already exists" >&2
+        exit 0
+    fi
+
+    # We use a named volume for ccache.
+    # The volume is managed by Docker and persists between containers.
+    CCACHE_VOLUME="ccache-$LIBRARY"
+
+    echo "Creating SYCL build container ($BUILD_IMAGE_NAME:latest)"
+    cp -r ../common build
+    docker build build --tag "$BUILD_IMAGE_NAME:latest"
+    BUILD_IMAGE_CONTAINER_ID=$(docker create \
+        --mount "type=bind,src=$SRC_DIR,dst=/src,ro=true" \
+        --mount "type=volume,src=$CCACHE_VOLUME,dst=/ccache" \
+        "$BUILD_IMAGE_NAME:latest"
+    )
+
+    function cleanup {
+        echo "Removing SYCL build container ($BUILD_IMAGE_CONTAINER_ID)"
+        docker rm "$BUILD_IMAGE_CONTAINER_ID"
+    }
+    trap cleanup EXIT
+
+    echo "Starting SYCL build container ($BUILD_IMAGE_CONTAINER_ID)"
+    docker start --attach "$BUILD_IMAGE_CONTAINER_ID"
+    echo "Copying installation files to host"
+    docker cp "$BUILD_IMAGE_CONTAINER_ID:/opt/$LIBRARY" "$PWD/install/opt"
+
+    echo "Building Celerity build container"
+    cp -r ../common install
+    echo "$VERSION" > install/VERSION
+    docker build --tag "$COMMIT_TAG" --tag "$GIT_REF_TAG" install
+}
+
+build-from-distribution() {
+    TARBALL="$1"
+
+    # log to a file to avoid choking tar on head -1 and triggering set -e
+    tar tf "$TARBALL" > /tmp/tarlist
+    PACKAGE_NAME="$(head -1 /tmp/tarlist | cut -d/ -f1)"
+    VERSION="$LIBRARY $REF"
+
+    echo "Building $VERSION"
+
+    IMAGE_NAME="build/celerity/$LIBRARY"
+    SYMBOLIC_TAG="$IMAGE_NAME:$(echo -n "$REF" | tr -sc 'A-Za-z0-9.' '-')"
+
+    EXISTING_IMAGE_ID="$(docker images -f "reference=$SYMBOLIC_TAG" -q)"
+    if [ -n "$EXISTING_IMAGE_ID" ] && ! [ -n "${FORCE+x}" ]; then
+        echo "Image $SYMBOLIC_TAG (aka $EXISTING_IMAGE_ID) already exists" >&2
+        exit 0
+    fi
+
+    rm -rf install/opt
+    mkdir -p install/opt
+    cd install/opt
+    tar xf "$TARBALL"
+    mv "$PACKAGE_NAME" "$LIBRARY"
+    cd ../..
+
+    cp -r ../common install
+    echo "$VERSION" > install/VERSION
+    docker build --tag "$SYMBOLIC_TAG" install
+}
+
+case "$LIBRARY" in
+    hipsycl) build-from-source "https://github.com/illuhad/hipSYCL.git";;
+    dpcpp) build-from-source "https://github.com/intel/llvm.git";;
+    computecpp) build-from-distribution "$(pwd)/dist/computecpp-ce-$REF-x86_64-linux-gnu.tar.gz";;
+    *) usage;;
+esac
 

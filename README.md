@@ -1,49 +1,61 @@
 # Celerity Docker CI
 
-Docker container for running Celerity CI jobs on gpuc1/2 and nuc21.
+Infrastructure for building and running Docker containers for Celerity CI.
 
-## Setup
+This repository itself also uses GitHub actions to create new nightly builds
+of CI containers for all supported SYCL implementations.
 
-This container requires support for BuildKit, which was introduced in Docker 18.09.
+## Prerequisites
 
-To build this container, some things have to be provided:
+Due to security considerations and limitations of GitHub's workflow definition
+files, we currently require the following prerequisites on the CI system:
 
-- A valid GitHub action runner token, which has to be placed into a file called
-	`token.txt`. This token can be obtained from the GitHub repository settings.
-- When ComputeCpp is enabled, a ComputeCpp installation needs to be provided,
-	which should be extracted from the tarball into a directory called `computecpp`
-	(i.e., this directory should contain the `bin` and `lib` folders etc).
+- Docker must be run [_rootless_](https://docs.docker.com/engine/security/rootless)
+    - The containers internally run as root, however this then just maps to
+      the user running the container on the host (which should *NOT* be root, obviously).
+- The `docker` executable must be _shimmed_ with our own [wrapper](docker-shim/docker)
+    - Make sure the shimmed executable is found first in `$PATH`
+    - The shimmed executable requires the environment variable
+      `CELERITY_CI_DOCKER_CREATE_OPTIONS` to be set (it can be empty -- see
+      below).
 
-To build the container image, use the `./build.sh` script. The script takes several
-parameters, for example the hardware platform to target (either Intel or NVIDIA),
-and which SYCL implementations to enable.
+The [`check-prerequisites.sh`](check-prerequisites.sh) script can be used to
+verify the setup.
 
-For convenience two wrapper scripts are provided:
-	- `./build-gpuc1.sh` builds the image for the NVIDIA platform, running on gpuc1.
-	- `./build-nuc21.sh` builds the image for the Intel platform, running on nuc21.
+## Building SYCL Container Images
 
-## Running on Intel
+To build a container for running Celerity CI for a given SYCL implementation,
+use the [`build.sh`](build.sh) script.
+
+The script creates two container images: One for building the SYCL
+implementation itself, and another for subsequently compiling Celerity against
+that SYCL implementation.
+
+## Platform-Specific Setup
+
+To run containers with GPU access, platform-specific setup is required. In
+particular, different options need to be passed to `docker create` (or
+equivalently `docker run`).
+
+Since the GitHub workflow definition files are rather inflexible regarding
+Docker options, we instead pass these options through the
+`CELERITY_CI_DOCKER_CREATE_OPTIONS` environment variable picked up by the
+shimmed Docker executable (see above).
+
+### Running on Intel
 
 To access Intel integrated GPUs, the device file needs to be mounted into the
-container: `docker run --device=/dev/dri/render*`.
+container. Set `CELERITY_CI_DOCKER_CREATE_OPTIONS="--device=/dev/dri/render*"`
+(where `*` should be expanded manually).
 
-## Running on NVIDIA
+### Running on NVIDIA
 
-Simply run the `celerity-ci-runner:latest` image, passing the `--gpus` flag. To enable
-NVIDIA GPU passthrough, be sure to install the [NVIDIA Container
+Set `CELERITY_CI_DOCKER_CREATE_OPTIONS="--gpus=all"`.
+
+To enable NVIDIA GPU passthrough, be sure to install the [NVIDIA Container
 Runtime](https://nvidia.github.io/nvidia-container-runtime/).
 
-For NVIDIA, this container can be run [_rootless_](https://docs.docker.com/engine/security/rootless).
-To make GPU passthrough work for rootless, as of Docker 19.03, `cgroups` need
-to be disabled. This can be done by providing the
+To make GPU passthrough work for rootless, as of Docker 19.03, `cgroups` need to
+be disabled. This can be done by providing the
 `nvidia-container-runtime-hook-config.toml` file to the Docker runtime hook
 using the `nvidia-container-runtime-hook` wrapper provided in this repository.
-
-## Installing as a service
-
-The Celerity CI container can be run automatically upon system restart by
-starting it with `--restart always`. If using rootless, the Docker service
-needs to additionally be started automatically by enabling systemd lingering.
-
-To disable auto-restart again, use `docker update --restart=no <container>`.
-

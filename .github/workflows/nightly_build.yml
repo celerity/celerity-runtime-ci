@@ -18,7 +18,7 @@ jobs:
               with:
                   lfs: true
             - name: Check whether system is setup correctly for building and running Celerity CI containers
-              run: bash ./docker/check-prerequisites.sh
+              run: bash ./check-prerequisites.sh
 
     build-sycl:
         needs: [check-prerequisites]
@@ -42,7 +42,7 @@ jobs:
               with:
                   lfs: true
             - name: Build Docker container for SYCL implementation
-              run: bash ./docker/build.sh ${{ matrix.sycl-version }}
+              run: bash ./build.sh ${{ matrix.sycl-version }}
 
     build-lint:
         needs: [check-prerequisites]
@@ -55,4 +55,4 @@ jobs:
         steps:
             - uses: actions/checkout@v2
             - name: Build Celerity linting container
-              run: bash ./docker/build-lint.sh
+              run: bash ./build-lint.sh

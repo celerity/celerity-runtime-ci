@@ -2,7 +2,7 @@
 
 set -eu
 sh /root/build-with-cmake.sh "$@" -- \
-	-DCMAKE_PREFIX_PATH="/opt/hipsycl/lib/cmake" \
+    -DCMAKE_PREFIX_PATH="/opt/hipsycl/lib/cmake" \
     -DHIPSYCL_TARGETS=cuda:sm_75
 
     # TODO ccache is currently broken for hipSYCL because it uses compiler launchers internally

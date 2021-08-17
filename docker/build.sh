@@ -16,7 +16,7 @@ while true; do
     case "$1" in
         -f | --force) FORCE=yes; shift;;
         --) shift; break;;
-		*) echo "Unexpected argument \"$1\"" >&2; usage;;
+        *) echo "Unexpected argument \"$1\"" >&2; usage;;
     esac
 done
 

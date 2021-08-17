@@ -1,58 +1,58 @@
 name: Nightly Build
 
 on:
-  workflow_dispatch:
-  schedule:
-    # Every night at 03:00 UTC
-    - cron: "0 3 * * *"
+    workflow_dispatch:
+    schedule:
+        # Every night at 03:00 UTC
+        - cron: "0 3 * * *"
 
 jobs:
-  check-prerequisites:
-    runs-on: ${{ matrix.platform }}
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: ["intel", "nvidia"]
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          lfs: true
-      - name: Check whether system is setup correctly for building and running Celerity CI containers
-        run: bash ./docker/check-prerequisites.sh
+    check-prerequisites:
+        runs-on: ${{ matrix.platform }}
+        strategy:
+            fail-fast: false
+            matrix:
+                platform: ["intel", "nvidia"]
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  lfs: true
+            - name: Check whether system is setup correctly for building and running Celerity CI containers
+              run: bash ./docker/check-prerequisites.sh
 
-  build-sycl:
-    needs: [check-prerequisites]
-    runs-on: ${{ matrix.platform }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - sycl-version: "computecpp:2.6.0"
-            platform: "intel"
-          - sycl-version: "dpcpp:HEAD"
-            platform: "intel"
-          - sycl-version: "dpcpp:7735139b"
-            platform: "intel"
-          - sycl-version: "hipsycl:HEAD"
-            platform: "nvidia"
-          - sycl-version: "hipsycl:v0.9.1"
-            platform: "nvidia"
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          lfs: true
-      - name: Build Docker container for SYCL implementation
-        run: bash ./docker/build.sh ${{ matrix.sycl-version }}
+    build-sycl:
+        needs: [check-prerequisites]
+        runs-on: ${{ matrix.platform }}
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    - sycl-version: "computecpp:2.6.0"
+                      platform: "intel"
+                    - sycl-version: "dpcpp:HEAD"
+                      platform: "intel"
+                    - sycl-version: "dpcpp:7735139b"
+                      platform: "intel"
+                    - sycl-version: "hipsycl:HEAD"
+                      platform: "nvidia"
+                    - sycl-version: "hipsycl:v0.9.1"
+                      platform: "nvidia"
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  lfs: true
+            - name: Build Docker container for SYCL implementation
+              run: bash ./docker/build.sh ${{ matrix.sycl-version }}
 
-  build-lint:
-    needs: [check-prerequisites]
-    runs-on: ${{ matrix.platform }}
-    strategy:
-      fail-fast: false
-      matrix:
-        # HACK: We need to ensure the lint container image exists on all runners
-        platform: ["intel", "nvidia"]
-    steps:
-      - uses: actions/checkout@v2
-      - name: Build Celerity linting container
-        run: bash ./docker/build-lint.sh
+    build-lint:
+        needs: [check-prerequisites]
+        runs-on: ${{ matrix.platform }}
+        strategy:
+            fail-fast: false
+            matrix:
+                # HACK: We need to ensure the lint container image exists on all runners
+                platform: ["intel", "nvidia"]
+        steps:
+            - uses: actions/checkout@v2
+            - name: Build Celerity linting container
+              run: bash ./docker/build-lint.sh

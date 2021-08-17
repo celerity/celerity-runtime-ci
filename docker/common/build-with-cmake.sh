@@ -15,10 +15,10 @@ unset TARGET
 BUILD_TYPE=Release
 while [ $# -gt 0 ]; do
     case "$1" in
-		--target) TARGET="$2"; shift 2;;
-		--build-type) BUILD_TYPE="$2"; shift 2;;
+        --target) TARGET="$2"; shift 2;;
+        --build-type) BUILD_TYPE="$2"; shift 2;;
         --) shift; break;;
-		*) echo "Unexpected argument \"$1\"" >&2; usage;;
+        *) echo "Unexpected argument \"$1\"" >&2; usage;;
     esac
 done
 

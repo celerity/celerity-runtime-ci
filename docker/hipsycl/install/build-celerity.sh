@@ -2,6 +2,7 @@
 
 set -eu
 sh /root/build-with-cmake.sh "$@" -- \
+    -DCELERITY_SYCL_IMPL=hipSYCL \
     -DCMAKE_PREFIX_PATH="/opt/hipsycl/lib/cmake" \
     -DHIPSYCL_TARGETS=cuda:sm_75
 

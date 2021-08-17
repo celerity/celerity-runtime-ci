@@ -13,7 +13,7 @@ shift
 
 unset TARGET
 BUILD_TYPE=Release
-while true; do
+while [ $# -gt 0 ]; do
     case "$1" in
 		--target) TARGET="$2"; shift 2;;
 		--build-type) BUILD_TYPE="$2"; shift 2;;

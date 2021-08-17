@@ -96,7 +96,7 @@ build-from-source() {
     echo "Building Celerity build container"
     cp -r ../common install
     echo "$VERSION" > install/VERSION
-    docker build --build-arg UID="$UID" --tag "$COMMIT_TAG" --tag "$GIT_REF_TAG" install
+    docker build --tag "$COMMIT_TAG" --tag "$GIT_REF_TAG" install
 }
 
 build-from-distribution() {
@@ -127,7 +127,7 @@ build-from-distribution() {
 
     cp -r ../common install
     echo "$VERSION" > install/VERSION
-    docker build --build-arg UID="$UID" --tag "$SYMBOLIC_TAG" install
+    docker build --tag "$SYMBOLIC_TAG" install
 }
 
 case "$LIBRARY" in

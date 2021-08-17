@@ -1,7 +1,7 @@
 #!/bin/sh
 
 set -eu
-sh ~/build-with-cmake.sh "$@" -- \
+sh /root/build-with-cmake.sh "$@" -- \
 	-DCMAKE_PREFIX_PATH="/opt/hipsycl/lib/cmake" \
     -DHIPSYCL_TARGETS=cuda:sm_75
 

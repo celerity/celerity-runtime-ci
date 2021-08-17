@@ -24,6 +24,6 @@ done
 
 N_CORES=$(getconf _NPROCESSORS_ONLN)
 
-cmake "$SOURCE_DIR" -B /home/user/build "$@" -DCMAKE_BUILD_TYPE="$BUILD_TYPE"
-cmake --build /home/user/build -j$N_CORES ${TARGET+--target "$TARGET"}
+cmake "$SOURCE_DIR" -B /root/build "$@" -DCMAKE_BUILD_TYPE="$BUILD_TYPE"
+cmake --build /root/build -j$N_CORES ${TARGET+--target "$TARGET"}
 

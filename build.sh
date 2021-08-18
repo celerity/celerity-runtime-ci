@@ -51,6 +51,7 @@ build-from-source() {
         || (echo "Error: cannot resolve Git ref $REF" >&2; exit 1)
 
     git -c advice.detachedHead=false checkout --force "$COMMIT_ID"
+    git clean -fdx
     git submodule update --init --recursive
     VERSION="$(git log --format=format:"$LIBRARY $REF @ %H | %ci" -1)"
 
@@ -77,7 +78,7 @@ build-from-source() {
     cp -r ../common build
     docker build build --tag "$BUILD_IMAGE_NAME:latest"
     BUILD_IMAGE_CONTAINER_ID=$(docker create \
-        --mount "type=bind,src=$SRC_DIR,dst=/src,ro=true" \
+        --mount "type=bind,src=$SRC_DIR,dst=/src" \
         --mount "type=volume,src=$CCACHE_VOLUME,dst=/ccache" \
         "$BUILD_IMAGE_NAME:latest"
     )

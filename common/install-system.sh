@@ -29,3 +29,7 @@ if [[ " $@ " =~ " clang-10 " ]]; then
         $SLAVES
 fi
 
+# Use GNU Gold for faster linking
+update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.gold" 20
+update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.bfd" 10
+

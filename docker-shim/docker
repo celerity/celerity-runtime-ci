@@ -12,7 +12,7 @@ if [ -v "CELERITY_DOCKER_SHIM_CHECK" ] && [ "$CELERITY_DOCKER_SHIM_CHECK" -eq 1 
         echo "CELERITY_CI_DOCKER_CREATE_OPTIONS is not set" 1>&2
         exit 1
     fi
-    echo "Docker shimmed"
+    echo "Docker shimmed" 1>&2
     exit 0
 fi
 

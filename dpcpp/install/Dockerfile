@@ -2,7 +2,8 @@ FROM ubuntu:20.04
 
 COPY --chown=root:root common/install-system.sh /root/install-system.sh
 RUN bash /root/install-system.sh libopenmpi-dev openmpi-bin pkg-config \
-        libhdf5-openmpi-103 libhdf5-openmpi-dev cmake ccache
+        libhdf5-openmpi-103 libhdf5-openmpi-dev cmake ccache ocl-icd-opencl-dev \
+        opencl-headers intel-opencl-icd
 
 COPY --chown=root:root opt/dpcpp /opt/dpcpp
 COPY --chown=root:root VERSION /VERSION

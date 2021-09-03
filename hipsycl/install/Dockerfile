@@ -9,8 +9,8 @@ FROM nvidia/cuda:11.3.0-devel-ubuntu20.04
 RUN echo "CUDA Version 11.3.0" > /usr/local/cuda/version.txt
 
 COPY --chown=root:root common/install-system.sh /root/install-system.sh
-RUN bash /root/install-system.sh cmake clang-10 ccache libopenmpi-dev openmpi-bin \
-        libomp-10-dev libhdf5-openmpi-103 libhdf5-openmpi-dev pkg-config \
+RUN bash /root/install-system.sh --base --cleanup cmake clang-10 ccache libopenmpi-dev \
+        openmpi-bin libomp-10-dev libhdf5-openmpi-103 libhdf5-openmpi-dev pkg-config \
         libboost-context-dev libboost-fiber-dev
 
 COPY --chown=root:root opt/hipsycl /opt/hipsycl

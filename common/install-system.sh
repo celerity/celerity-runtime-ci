@@ -2,14 +2,32 @@
 
 set -eu
 
+unset BASE
+unset CLEANUP
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --base) BASE=1; shift;;
+        --cleanup) CLEANUP=1; shift;;
+        --) shift; break;;
+        *) break;;
+    esac
+done
+
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
-apt-get full-upgrade -y
-apt-get install -y --no-install-recommends build-essential python3 git ca-certificates "$@"
+if [ -n "${BASE+x}" ]; then
+    apt-get full-upgrade -y
+    apt-get install -y --no-install-recommends build-essential python3 git ca-certificates
+fi
+if [ $# -gt 0 ]; then
+    apt-get install -y --no-install-recommends "$@"
+fi
 
-# Don't keep around apt cache in docker image
-apt-get clean
-rm -rf /var/lib/apt/lists/*
+if [ -n "${CLEANUP+x}" ]; then
+    # Don't keep around apt cache in docker image
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
+fi
 
 if [[ " $@ " =~ " libhdf5-openmpi-dev " ]]; then
     # HDF5 pkg-config exports an incorrect include path, which CMake chokes on

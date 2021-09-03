@@ -1,7 +1,7 @@
 FROM ubuntu:20.04
 
 COPY --chown=root:root common/install-system.sh /root/install-system.sh
-RUN bash /root/install-system.sh libopenmpi-dev openmpi-bin pkg-config \
+RUN bash /root/install-system.sh --base --cleanup libopenmpi-dev openmpi-bin pkg-config \
         libhdf5-openmpi-103 libhdf5-openmpi-dev cmake ccache ocl-icd-opencl-dev \
         opencl-headers intel-opencl-icd
 

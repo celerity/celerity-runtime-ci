@@ -35,6 +35,8 @@ jobs:
                       platform: "intel"
                     - sycl-version: "hipsycl:HEAD"
                       platform: "nvidia"
+                    - sycl-version: "hipsycl:7b00e2ef"
+                      platform: "nvidia"
                     - sycl-version: "hipsycl:v0.9.1"
                       platform: "nvidia"
         steps:

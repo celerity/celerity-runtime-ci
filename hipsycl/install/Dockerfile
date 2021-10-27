@@ -18,6 +18,7 @@ COPY --chown=root:root opt/hipsycl /opt/hipsycl
 COPY --chown=root:root VERSION /VERSION
 COPY --chown=root:root common/build-with-cmake.sh /root/build-with-cmake.sh
 COPY --chown=root:root build-celerity.sh /root/build-celerity.sh
+COPY --chown=root:root build-examples.sh /root/build-examples.sh
 COPY --chown=root:root common/data /data
 
 ENV OMPI_ALLOW_RUN_AS_ROOT=1 OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1

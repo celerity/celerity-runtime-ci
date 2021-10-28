@@ -10,7 +10,7 @@ usage() {
 if [ $# -lt 2 ]; then usage; fi
 BUILD_DIR="$1"
 SOURCE_DIR="$2"
-shift
+shift 2
 
 unset TARGET
 BUILD_TYPE=Release
@@ -19,7 +19,7 @@ while [ $# -gt 0 ]; do
         --target) TARGET="$2"; shift 2;;
         --build-type) BUILD_TYPE="$2"; shift 2;;
         --) shift; break;;
-        *) echo "Unexpected argument \"$1\"" >&2; usage; fi;;
+        *) echo "Unexpected argument \"$1\"" >&2; usage;;
     esac
 done
 

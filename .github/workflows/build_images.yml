@@ -1,10 +1,13 @@
-name: Nightly Build
+name: Build Docker images
 
 on:
     workflow_dispatch:
     schedule:
         # Every night at 03:00 UTC
         - cron: "0 3 * * *"
+    push:
+      branches:
+        - master
 
 jobs:
     check-prerequisites:
@@ -43,8 +46,12 @@ jobs:
             - uses: actions/checkout@v2
               with:
                   lfs: true
-            - name: Build Docker container for SYCL implementation
+            - name: Build Docker container for ${{ matrix.sycl-version }}
               run: bash ./build.sh ${{ matrix.sycl-version }}
+              if: ${{ github.event_name == 'schedule' }}
+            - name: Force-build Docker container for ${{ matrix.sycl-version }}
+              run: bash ./build.sh -f ${{ matrix.sycl-version }}
+              if: ${{ github.event_name != 'schedule' }}
 
     build-lint:
         needs: [check-prerequisites]

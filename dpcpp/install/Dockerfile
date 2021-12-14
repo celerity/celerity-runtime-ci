@@ -27,8 +27,9 @@ RUN mkdir /root/intel \
 COPY --chown=root:root opt/dpcpp /opt/dpcpp
 COPY --chown=root:root VERSION /VERSION
 COPY --chown=root:root common/build-with-cmake.sh /root/build-with-cmake.sh
-COPY --chown=root:root build-celerity.sh /root/build-celerity.sh
-COPY --chown=root:root build-examples.sh /root/build-examples.sh
+COPY --chown=root:root common/build-celerity.sh /root/build-celerity.sh
+COPY --chown=root:root common/build-examples.sh /root/build-examples.sh
+COPY --chown=root:root build-options.sh /root/build-options.sh
 COPY --chown=root:root common/data /data
 
 RUN ldconfig /opt/dpcpp/lib

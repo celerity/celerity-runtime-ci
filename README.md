@@ -59,3 +59,10 @@ To make GPU passthrough work for rootless, as of Docker 19.03, `cgroups` need to
 be disabled. This can be done by providing the
 `nvidia-container-runtime-hook-config.toml` file to the Docker runtime hook
 using the `nvidia-container-runtime-hook` wrapper provided in this repository.
+
+## Interaction with celerity-runtime CMake
+
+Building and running examples against the installed Celerity Runtime is a bit finicky because which examples can be run depends on the exported configuration (e.g. `CELERITY_FEATURE_SIMPLE_SCALAR_REDUCTIONS`).
+
+`common/build-examples.sh` will attempt to build all subdirectories of the `examples` folder as standalone projects. If any of those reports an error containing the substring `Skip this test`, it will not propagate the non-zero status but continue without that build. This is currently used by the `reduction` example.
+

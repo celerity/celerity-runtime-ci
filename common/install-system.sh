@@ -51,3 +51,6 @@ fi
 update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.gold" 20
 update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.bfd" 10
 
+if [[ " $@ " =~ " gdb " ]]; then
+    echo 'set auto-load safe-path /' >> /etc/gdb/gdbinit
+fi

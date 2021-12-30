@@ -32,6 +32,8 @@ jobs:
                 include:
                     - sycl-version: "computecpp:2.6.0"
                       platform: "intel"
+                    - sycl-version: "computecpp:2.8.0"
+                      platform: "intel"
                     - sycl-version: "dpcpp:HEAD"
                       platform: "intel"
                     - sycl-version: "dpcpp:7735139b"

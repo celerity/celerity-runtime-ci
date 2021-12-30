@@ -134,7 +134,7 @@ build-from-distribution() {
 case "$LIBRARY" in
     hipsycl) build-from-source "https://github.com/illuhad/hipSYCL.git";;
     dpcpp) build-from-source "https://github.com/intel/llvm.git";;
-    computecpp) build-from-distribution "$(pwd)/dist/computecpp-ce-$REF-x86_64-linux-gnu.tar.gz";;
+    computecpp) build-from-distribution "$(pwd)/dist/computecpp-ce-$REF-x86_64-linux-gnu.tar"*;;
     *) usage;;
 esac
 

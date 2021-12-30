@@ -9,8 +9,8 @@ FROM nvidia/cuda:11.3.0-devel-ubuntu20.04
 RUN echo "CUDA Version 11.3.0" > /usr/local/cuda/version.txt
 
 COPY common/install-system.sh /root/install-system.sh
-RUN bash /root/install-system.sh --base --cleanup clang-10 libclang-10-dev llvm-10-dev cmake \
-        ccache libboost-context-dev libboost-fiber-dev
+RUN bash /root/install-system.sh clang libclang-dev llvm-dev cmake make ccache \
+        libboost-context-dev libboost-fiber-dev lld
 
 COPY common/build-with-cmake.sh build-hipsycl.sh /root/
 

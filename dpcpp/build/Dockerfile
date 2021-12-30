@@ -1,7 +1,8 @@
 FROM ubuntu:20.04
 
 COPY common/install-system.sh /root/install-system.sh
-RUN bash /root/install-system.sh --base --cleanup clang-10 cmake ccache pkg-config ninja-build
+RUN bash /root/install-system.sh python3 clang lld cmake ccache pkg-config ninja-build \
+        git ca-certificates
 
 COPY common/build-with-cmake.sh build-dpcpp.sh /root/
 

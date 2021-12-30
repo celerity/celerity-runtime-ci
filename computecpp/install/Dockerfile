@@ -1,9 +1,9 @@
 FROM ubuntu:20.04
 
 COPY common/install-system.sh /root/install-system.sh
-RUN bash /root/install-system.sh --base --cleanup cmake clang-10 ccache libopenmpi-dev \
-        openmpi-bin ocl-icd-opencl-dev opencl-headers intel-opencl-icd libhdf5-openmpi-103 \
-        libhdf5-openmpi-dev pkg-config gdb
+RUN bash /root/install-system.sh cmake clang ccache libopenmpi-dev openmpi-bin \
+        ocl-icd-opencl-dev opencl-headers intel-opencl-icd libhdf5-openmpi-103 \
+        libhdf5-openmpi-dev pkg-config gdb lld make git ca-certificates python3
 
 COPY opt/computecpp /opt/computecpp
 

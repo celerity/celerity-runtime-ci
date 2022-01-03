@@ -23,9 +23,15 @@ while [ $# -gt 0 ]; do
     esac
 done
 
+CMAKE_CONFIG=(-DCMAKE_BUILD_TYPE="$BUILD_TYPE")
+if [ "$BUILD_TYPE" == Release ]; then
+    # Release + -g uses -O3, whereas RelWithDebInfo uses only -O2
+    CMAKE_CONFIG+=(-DCMAKE_C_FLAGS=-g -DCMAKE_CXX_FLAGS=-g)
+fi
+
 N_CORES=$(getconf _NPROCESSORS_ONLN)
 
 rm -rf "$BUILD_DIR"
-cmake "$SOURCE_DIR" -B "$BUILD_DIR" "$@" -DCMAKE_BUILD_TYPE="$BUILD_TYPE"
+cmake "$SOURCE_DIR" -B "$BUILD_DIR" "${CMAKE_CONFIG[@]}" "$@"
 cmake --build "$BUILD_DIR" -j$N_CORES ${TARGET+--target "$TARGET"}
 

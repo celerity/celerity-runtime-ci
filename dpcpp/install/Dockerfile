@@ -2,8 +2,8 @@ FROM ubuntu:20.04
 
 COPY --chown=root:root common/install-system.sh /root/install-system.sh
 RUN bash /root/install-system.sh curl libopenmpi-dev openmpi-bin pkg-config libhdf5-openmpi-103 \
-        libhdf5-openmpi-dev cmake ccache gdb make python3 lld git ca-certificates python3 \
-        libstdc++-9-dev libgcc-9-dev libc6-dev
+        libhdf5-openmpi-dev cmake ccache gdb python3 lld git ca-certificates python3 \
+        libstdc++-9-dev libgcc-9-dev libc6-dev ninja-build
 
 ARG IGC_VER=1.0.8365 \
     CRT_VER=21.34.20767 \
@@ -33,7 +33,9 @@ COPY common/data /data
 
 RUN ldconfig /opt/dpcpp/lib
 
+# CCACHE_DEPEND=1 works around https://github.com/intel/llvm/issues/5260
 ENV OMPI_ALLOW_RUN_AS_ROOT=1 \
     OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1 \
     PATH="/opt/dpcpp/bin:${PATH}" \
-    CCACHE_DIR=/ccache/dpcpp
+    CCACHE_DIR=/ccache/dpcpp \
+    CCACHE_DEPEND=1

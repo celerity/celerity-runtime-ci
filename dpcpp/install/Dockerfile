@@ -3,7 +3,7 @@ FROM ubuntu:20.04
 COPY --chown=root:root common/install-system.sh /root/install-system.sh
 RUN bash /root/install-system.sh curl libopenmpi-dev openmpi-bin pkg-config libhdf5-openmpi-103 \
         libhdf5-openmpi-dev cmake ccache gdb python3 lld git ca-certificates python3 \
-        libstdc++-9-dev libgcc-9-dev libc6-dev ninja-build
+        libstdc++-9-dev libgcc-9-dev libc6-dev ninja-build libboost-all-dev
 
 ARG IGC_VER=1.0.8365 \
     CRT_VER=21.34.20767 \
@@ -27,8 +27,8 @@ RUN mkdir /root/intel \
 
 COPY opt/dpcpp /opt/dpcpp
 COPY VERSION /VERSION
-COPY common/build-with-cmake.sh common/build-celerity.sh common/build-examples.sh \
-        build-options.sh common/capture-backtrace.sh /root/
+COPY common/build-with-cmake.sh common/build-ndzip.sh common/build-celerity.sh \
+        common/build-examples.sh build-options.sh common/capture-backtrace.sh /root/
 COPY common/data /data
 
 RUN ldconfig /opt/dpcpp/lib

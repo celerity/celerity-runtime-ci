@@ -1,14 +1,19 @@
 #!/bin/bash
 
+NDZIP_BUILD_OPTS=(
+    -DCMAKE_PREFIX_PATH="/opt/hipsycl/lib/cmake"
+    -DHIPSYCL_TARGETS=cuda:sm_75
+)
+
 CELERITY_BUILD_OPTS=(
-    -DCELERITY_SYCL_IMPL=hipSYCL \
-    -DCMAKE_PREFIX_PATH="/opt/hipsycl/lib/cmake" \
-    -DHIPSYCL_TARGETS=cuda:sm_75 \
+    -DCELERITY_SYCL_IMPL=hipSYCL 
+    -DCMAKE_PREFIX_PATH="/opt/hipsycl/lib/cmake"
+    -DHIPSYCL_TARGETS=cuda:sm_75
     -DCMAKE_INSTALL_PREFIX=/root/celerity-install
 )
 
 EXAMPLES_BUILD_OPTS=(
-    -DCMAKE_PREFIX_PATH="/opt/hipsycl/lib/cmake;/root/celerity-install/lib/cmake" \
+    -DCMAKE_PREFIX_PATH="/opt/hipsycl/lib/cmake;/root/celerity-install/lib/cmake"
     -DHIPSYCL_TARGETS=cuda:sm_75
 )
 

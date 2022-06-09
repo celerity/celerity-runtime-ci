@@ -1,11 +1,5 @@
 #!/bin/bash
 
-NDZIP_BUILD_OPTS=(
-    -DComputeCpp_DIR="/opt/computecpp"
-    -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
-    -DCMAKE_C_COMPILER_LAUNCHER=ccache
-)
-
 CELERITY_BUILD_OPTS=(
     -DCELERITY_SYCL_IMPL=ComputeCpp
     -DComputeCpp_DIR="/opt/computecpp"

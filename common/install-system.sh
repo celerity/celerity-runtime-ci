@@ -32,18 +32,23 @@ fi
 apt-get clean
 rm -rf /var/lib/apt/lists/*
 
-if [[ " ${PACKAGES[*]} " =~ " libhdf5-openmpi-dev " ]]; then
+if [ -d "/usr/lib/x86_64-linux-gnu/openmpi/include/openmpi" ]; then
     # HDF5 pkg-config exports an incorrect include path, which CMake chokes on
     ln -s /usr/lib/x86_64-linux-gnu/openmpi/include/openmpi /usr/include/openmpi
 fi
 
 # Use lld or GNU gold for faster linking
-if [[ " ${PACKAGES[*]} " =~ " lld " ]]; then
+if [ -x "/usr/bin/ld.lld" ]; then
     update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.lld" 30
 fi
-update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.gold" 20
-update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.bfd" 10
+if [ -x "/usr/bin/ld.gold" ]; then
+	update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.gold" 20
+fi
+if [ -x "/usr/bin/ld.bfd" ]; then
+	update-alternatives --install "/usr/bin/ld" "ld" "/usr/bin/ld.bfd" 10
+fi
 
-if [[ " ${PACKAGES[*]} " =~ " gdb " ]]; then
+if [ -d "/etc/gdb" ]; then
     echo 'set auto-load safe-path /' >> /etc/gdb/gdbinit
 fi
+

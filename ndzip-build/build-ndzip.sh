@@ -2,7 +2,7 @@
 
 set -eu
 
-source /root/build-options.sh
+source /root/ndzip-options.sh
 
 bash /root/build-with-cmake.sh /root/build "$@" -- \
     "${NDZIP_BUILD_OPTS[@]}" \

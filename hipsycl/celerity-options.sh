@@ -1,10 +1,5 @@
 #!/bin/bash
 
-NDZIP_BUILD_OPTS=(
-    -DCMAKE_PREFIX_PATH="/opt/hipsycl/lib/cmake"
-    -DHIPSYCL_TARGETS=cuda:sm_75
-)
-
 CELERITY_BUILD_OPTS=(
     -DCELERITY_SYCL_IMPL=hipSYCL 
     -DCMAKE_PREFIX_PATH="/opt/hipsycl/lib/cmake"

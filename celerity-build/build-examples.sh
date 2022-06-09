@@ -2,7 +2,7 @@
 
 set -eu
 
-source /root/build-options.sh
+source /root/celerity-options.sh
 
 # Workaround for https://bugs.launchpad.net/ubuntu/+source/openmpi/+bug/1941786
 export LDFLAGS=-lopen-pal

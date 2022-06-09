@@ -1,4 +1,5 @@
-FROM ubuntu:20.04
+ARG UBUNTU
+FROM ubuntu:${UBUNTU}
 
 COPY common/install-system.sh /root/install-system.sh
 RUN bash /root/install-system.sh cmake clang ccache libopenmpi-dev openmpi-bin \

@@ -30,39 +30,63 @@ jobs:
             fail-fast: false
             matrix:
                 include:
-                    - sycl-version: "computecpp:2.6.0"
+                    - sycl: "computecpp"
+                      sycl-version: "2.6.0"
+                      ubuntu-version: "20.04"
                       platform: "intel"
-                    - sycl-version: "computecpp:2.7.0"
+                    - sycl: "computecpp"
+                      sycl-version: "2.7.0"
+                      ubuntu-version: "20.04"
                       platform: "intel"
-                    - sycl-version: "computecpp:2.7.0-experimental"
+                    - sycl: "computecpp"
+                      sycl-version: "2.7.0-experimental"
+                      ubuntu-version: "20.04"
                       platform: "intel"
-                    - sycl-version: "computecpp:2.8.0"
+                    - sycl: "computecpp"
+                      sycl-version: "2.8.0"
+                      ubuntu-version: "20.04"
                       platform: "intel"
-                    - sycl-version: "computecpp:2.8.0-experimental"
+                    - sycl: "computecpp"
+                      sycl-version: "2.8.0-experimental"
+                      ubuntu-version: "20.04"
                       platform: "intel"
-                    - sycl-version: "computecpp:2.9.0"
+                    - sycl: "computecpp"
+                      sycl-version: "2.9.0"
+                      ubuntu-version: "22.04"
                       platform: "intel"
-                    - sycl-version: "computecpp:2.9.0-experimental"
+                    - sycl: "computecpp"
+                      sycl-version: "2.9.0-experimental"
+                      ubuntu-version: "22.04"
                       platform: "intel"
-                    - sycl-version: "dpcpp:HEAD"
+                    - sycl: "dpcpp"
+                      sycl-version: "HEAD"
+                      ubuntu-version: "22.04"
                       platform: "intel"
-                    - sycl-version: "dpcpp:7735139b"
+                    - sycl: "dpcpp"
+                      sycl-version: "7735139b"
+                      ubuntu-version: "20.04"
                       platform: "intel"
-                    - sycl-version: "hipsycl:HEAD"
+                    - sycl: "hipsycl"
+                      sycl-version: "HEAD"
+                      ubuntu-version: "22.04"
                       platform: "nvidia"
-                    - sycl-version: "hipsycl:7b00e2ef"
+                    - sycl: "hipsycl"
+                      sycl-version: "7b00e2ef"
+                      ubuntu-version: "20.04"
                       platform: "nvidia"
-                    - sycl-version: "hipsycl:v0.9.1"
+                    - sycl: "hipsycl"
+                      sycl-version: "v0.9.1"
+                      ubuntu-version: "20.04"
                       platform: "nvidia"
         steps:
             - uses: actions/checkout@v2
               with:
                   lfs: true
-            - name: Build Docker container for ${{ matrix.sycl-version }}
-              run: bash ./build.sh ${{ matrix.sycl-version }}
+            - name: Build Docker container for ${{ matrix.sycl }} ${{ matrix.sycl-version }} on ${{ matrix.ubuntu-version }}
+              run: bash ./build.sh ${{ matrix.ubuntu-version }} ${{ matrix.sycl }} ${{ matrix.sycl-version }}
               if: ${{ github.event_name == 'schedule' }}
-            - name: Force-build Docker container for ${{ matrix.sycl-version }}
-              run: bash ./build.sh -f ${{ matrix.sycl-version }}
+            - name: Force-build Docker container for ${{ matrix.sycl }} ${{ matrix.sycl-version }} on ${{ matrix.ubuntu-version }}
+              run: bash ./build.sh -f ${{ matrix.ubuntu-version }} ${{ matrix.sycl }} ${{ matrix.sycl-version }}
               if: ${{ github.event_name != 'schedule' }}
 
     build-lint:

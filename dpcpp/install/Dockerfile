@@ -1,4 +1,5 @@
-FROM ubuntu:20.04
+ARG UBUNTU
+FROM ubuntu:${UBUNTU}
 
 COPY --chown=root:root common/install-system.sh /root/install-system.sh
 RUN bash /root/install-system.sh curl libopenmpi-dev openmpi-bin pkg-config libhdf5-openmpi-103 \

@@ -12,8 +12,8 @@ source /etc/lsb-release
 
 # Some package names depend on the LLVM version (=> Ubuntu version)
 case "$DISTRIB_RELEASE" in
-	20.04) LLVM=10;;
-	22.04) LLVM=14;;
+	20.04) LLVM=10 GCC=9;;
+	22.04) LLVM=14 GCC=12;;
 	*) echo "Unsupported Ubuntu version $DISTRIB_RELEASE">&2; exit 1;;
 esac
 
@@ -21,6 +21,8 @@ esac
 for i in "${!PACKAGES[@]}"; do
 	case "${PACKAGES[i]}" in
 		libomp-dev) PACKAGES[i]="libomp-$LLVM-dev";;
+		libstdc++-dev) PACKAGES[i]="libstdc++-$GCC-dev";;
+		libgcc-dev) PACKAGES[i]="libgcc-$GCC-dev";;
 	esac
 done
 

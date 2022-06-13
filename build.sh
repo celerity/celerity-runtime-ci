@@ -144,7 +144,7 @@ build-sycl-from-distribution() {
     cd ../..
 
     cp -r ../common install >&2
-    echo "$VERSION" > install/VERSION >&2
+    echo "$VERSION" > install/VERSION
     docker build \
 		--build-arg=UBUNTU="$UBUNTU" ${CUDA+"--build-arg=CUDA=$CUDA"} \
 		--tag "$SYMBOLIC_TAG" install >&2

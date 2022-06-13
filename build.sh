@@ -27,11 +27,11 @@ REF="$3"
 
 unset CUDA
 if [ "$SYCL" == hipsycl ]; then
-	case "$UBUNTU" in
-		20.04) CUDA=11.0.3;;
-		22.04) CUDA=11.7.0;;
-		*) echo "I don't know which CUDA version to select for Ubuntu $UBUNTU" >&2; exit 1;;
-	esac
+    case "$UBUNTU" in
+        20.04) CUDA=11.0.3;;
+        22.04) CUDA=11.7.0;;
+        *) echo "I don't know which CUDA version to select for Ubuntu $UBUNTU" >&2; exit 1;;
+    esac
 fi
 
 ROOT_DIR="$(readlink -f "$(dirname "$0")")"
@@ -68,7 +68,7 @@ build-sycl-from-source() {
     echo "Building $VERSION" >&2
 
     BUILD_IMAGE_TAG="$SYCL-build/ubuntu$UBUNTU"
-	BASE_TAG="$SYCL:ubuntu$UBUNTU"
+    BASE_TAG="$SYCL:ubuntu$UBUNTU"
     COMMIT_TAG="$BASE_TAG-$COMMIT_ID"
     GIT_REF_TAG="$BASE_TAG-$(echo -n "$REF" | tr -sc 'A-Za-z0-9.' '-')"
 
@@ -76,7 +76,7 @@ build-sycl-from-source() {
     if [ -n "$EXISTING_IMAGE_ID" ] && ! [ -n "${FORCE+x}" ]; then
         docker tag "$COMMIT_TAG" "$GIT_REF_TAG" >&2
         echo "Image $GIT_REF_TAG (aka $EXISTING_IMAGE_ID) already exists" >&2
-		echo "$GIT_REF_TAG" # stdout, captured by caller
+        echo "$GIT_REF_TAG" # stdout, captured by caller
         exit 0
     fi
 
@@ -87,8 +87,8 @@ build-sycl-from-source() {
     echo "Creating SYCL build container ($BUILD_IMAGE_TAG)" >&2
     cp -r ../common build >&2
     docker build build \
-		--build-arg=UBUNTU="$UBUNTU" ${CUDA+"--build-arg=CUDA=$CUDA"} \
-		--tag "$BUILD_IMAGE_TAG" >&2
+        --build-arg=UBUNTU="$UBUNTU" ${CUDA+"--build-arg=CUDA=$CUDA"} \
+        --tag "$BUILD_IMAGE_TAG" >&2
     BUILD_IMAGE_CONTAINER_ID=$(docker create \
         --mount "type=bind,src=$SRC_DIR,dst=/src" \
         --mount "type=volume,src=$CCACHE_VOLUME,dst=/ccache" \
@@ -110,10 +110,10 @@ build-sycl-from-source() {
     cp -r ../common install >&2
     echo "$VERSION" > install/VERSION
     docker build \
-		--build-arg=UBUNTU="$UBUNTU" ${CUDA+"--build-arg=CUDA=$CUDA"} \
-		--tag "$COMMIT_TAG" --tag "$GIT_REF_TAG" install >&2
+        --build-arg=UBUNTU="$UBUNTU" ${CUDA+"--build-arg=CUDA=$CUDA"} \
+        --tag "$COMMIT_TAG" --tag "$GIT_REF_TAG" install >&2
 
-	echo "$GIT_REF_TAG" # stdout, captured by caller
+    echo "$GIT_REF_TAG" # stdout, captured by caller
 }
 
 build-sycl-from-distribution() {
@@ -126,13 +126,13 @@ build-sycl-from-distribution() {
 
     echo "Building $VERSION" >&2
 
-	BASE_TAG="$SYCL:ubuntu$UBUNTU"
+    BASE_TAG="$SYCL:ubuntu$UBUNTU"
     SYMBOLIC_TAG="$BASE_TAG-$(echo -n "$REF" | tr -sc 'A-Za-z0-9.' '-')"
 
     EXISTING_IMAGE_ID="$(docker images -f "reference=$SYMBOLIC_TAG" -q)"
     if [ -n "$EXISTING_IMAGE_ID" ] && ! [ -n "${FORCE+x}" ]; then
         echo "Image $SYMBOLIC_TAG (aka $EXISTING_IMAGE_ID) already exists" >&2
-		echo "$SYMBOLIC_TAG" # stdout, captured by caller
+        echo "$SYMBOLIC_TAG" # stdout, captured by caller
         exit 0
     fi
 
@@ -146,34 +146,34 @@ build-sycl-from-distribution() {
     cp -r ../common install >&2
     echo "$VERSION" > install/VERSION
     docker build \
-		--build-arg=UBUNTU="$UBUNTU" ${CUDA+"--build-arg=CUDA=$CUDA"} \
-		--tag "$SYMBOLIC_TAG" install >&2
+        --build-arg=UBUNTU="$UBUNTU" ${CUDA+"--build-arg=CUDA=$CUDA"} \
+        --tag "$SYMBOLIC_TAG" install >&2
 
-	echo "$SYMBOLIC_TAG" # stdout, captured by caller
+    echo "$SYMBOLIC_TAG" # stdout, captured by caller
 }
 
 cd "$SYCL_DIR"
 case "$SYCL" in
-	hipsycl) SYCL_IMAGE=$(build-sycl-from-source "https://github.com/illuhad/hipSYCL.git");;
-	dpcpp) SYCL_IMAGE=$(build-sycl-from-source "https://github.com/intel/llvm.git");;
+    hipsycl) SYCL_IMAGE=$(build-sycl-from-source "https://github.com/illuhad/hipSYCL.git");;
+    dpcpp) SYCL_IMAGE=$(build-sycl-from-source "https://github.com/intel/llvm.git");;
     computecpp)
         set -- ${REF//-/ }  # split args on -
         DISTRIBUTION="computecpp${2:+"_$2"}-ce"
         VERSION="$1"
         SYSTEM=x86_64-linux-gnu
-		SYCL_IMAGE=$(build-sycl-from-distribution "$(pwd)/dist/$DISTRIBUTION-$VERSION-$SYSTEM.tar"*)
+        SYCL_IMAGE=$(build-sycl-from-distribution "$(pwd)/dist/$DISTRIBUTION-$VERSION-$SYSTEM.tar"*)
         ;;
     *) usage;;
 esac
 
 build-project-env() {
     PROJECT="$1"
-	cp -r common "$PROJECT"-build >&2
-	cp "$SYCL/$PROJECT-options.sh" $PROJECT-build
-	docker build \
-		--build-arg=SYCL_IMAGE="$SYCL_IMAGE" \
-		--tag "$PROJECT-build/$SYCL_IMAGE" \
-		$PROJECT-build >&2
+    cp -r common "$PROJECT"-build >&2
+    cp "$SYCL/$PROJECT-options.sh" $PROJECT-build
+    docker build \
+        --build-arg=SYCL_IMAGE="$SYCL_IMAGE" \
+        --tag "$PROJECT-build/$SYCL_IMAGE" \
+        $PROJECT-build >&2
 }
 
 cd "$ROOT_DIR"

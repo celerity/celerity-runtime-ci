@@ -3,8 +3,8 @@
 set -eu
 
 export DEBIAN_FRONTEND=noninteractive
-apt-get update
-apt-get full-upgrade -y
+apt-get -q update
+apt-get -q full-upgrade -y
 
 PACKAGES=( "$@" )
 
@@ -27,11 +27,11 @@ for i in "${!PACKAGES[@]}"; do
 done
 
 if [ $# -gt 0 ]; then
-    apt-get install -y --no-install-recommends "${PACKAGES[@]}"
+    apt-get -q install -y --no-install-recommends "${PACKAGES[@]}"
 fi
 
 # Don't keep around apt cache in docker image
-apt-get clean
+apt-get -q clean
 rm -rf /var/lib/apt/lists/*
 
 if [ -d "/usr/lib/x86_64-linux-gnu/openmpi/include/openmpi" ]; then

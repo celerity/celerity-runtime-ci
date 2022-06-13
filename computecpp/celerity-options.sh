@@ -1,6 +1,8 @@
 #!/bin/bash
 
 CELERITY_BUILD_OPTS=(
+    -DCMAKE_C_COMPILER="/usr/bin/clang"
+    -DCMAKE_CXX_COMPILER="/usr/bin/clang++"
     -DCELERITY_SYCL_IMPL=ComputeCpp
     -DComputeCpp_DIR="/opt/computecpp"
     -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
@@ -9,6 +11,8 @@ CELERITY_BUILD_OPTS=(
 )
 
 EXAMPLES_BUILD_OPTS=(
+    -DCMAKE_C_COMPILER="/usr/bin/clang"
+    -DCMAKE_CXX_COMPILER="/usr/bin/clang++"
     -DCMAKE_PREFIX_PATH=/root/celerity-install/lib/cmake
     -DComputeCpp_DIR="/opt/computecpp"
     -DCMAKE_CXX_COMPILER_LAUNCHER=ccache

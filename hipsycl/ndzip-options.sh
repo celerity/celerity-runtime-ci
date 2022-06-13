@@ -1,6 +1,8 @@
 #!/bin/bash
 
 NDZIP_BUILD_OPTS=(
+    -DCMAKE_C_COMPILER="/usr/bin/clang"
+    -DCMAKE_CXX_COMPILER="/usr/bin/clang++"
     -DCMAKE_PREFIX_PATH="/opt/hipsycl/lib/cmake"
     -DHIPSYCL_TARGETS=cuda:sm_75
 )

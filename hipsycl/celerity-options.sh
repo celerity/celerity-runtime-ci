@@ -1,6 +1,8 @@
 #!/bin/bash
 
 CELERITY_BUILD_OPTS=(
+    -DCMAKE_C_COMPILER="/usr/bin/clang"
+    -DCMAKE_CXX_COMPILER="/usr/bin/clang++"
     -DCELERITY_SYCL_IMPL=hipSYCL 
     -DCMAKE_PREFIX_PATH="/opt/hipsycl/lib/cmake"
     -DHIPSYCL_TARGETS=cuda:sm_75
@@ -8,6 +10,8 @@ CELERITY_BUILD_OPTS=(
 )
 
 EXAMPLES_BUILD_OPTS=(
+    -DCMAKE_C_COMPILER="/usr/bin/clang"
+    -DCMAKE_CXX_COMPILER="/usr/bin/clang++"
     -DCMAKE_PREFIX_PATH="/opt/hipsycl/lib/cmake;/root/celerity-install/lib/cmake"
     -DHIPSYCL_TARGETS=cuda:sm_75
 )

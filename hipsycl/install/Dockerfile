@@ -15,7 +15,7 @@ RUN echo "CUDA Version $CUDA" > /usr/local/cuda/version.txt
 
 # libomp-dev: package name is substituted by install-system.sh
 COPY common/install-system.sh /root/install-system.sh
-RUN bash /root/install-system.sh cmake clang libomp-dev \
+RUN bash /root/install-system.sh cmake clang clang-tidy libomp-dev \
         libboost-fiber-dev libboost-context-dev make python3
 
 COPY opt/hipsycl /opt/hipsycl

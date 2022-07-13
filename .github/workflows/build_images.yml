@@ -11,7 +11,7 @@ on:
 
 jobs:
     check-prerequisites:
-        runs-on: ${{ matrix.platform }}
+        runs-on: slurm-${{ matrix.platform }}
         strategy:
             fail-fast: false
             matrix:
@@ -25,7 +25,7 @@ jobs:
 
     build-sycl:
         needs: [check-prerequisites]
-        runs-on: ${{ matrix.platform }}
+        runs-on: slurm-${{ matrix.platform }}
         strategy:
             fail-fast: false
             matrix:
@@ -99,7 +99,7 @@ jobs:
 
     build-lint:
         needs: [check-prerequisites]
-        runs-on: ${{ matrix.platform }}
+        runs-on: slurm-${{ matrix.platform }}
         strategy:
             fail-fast: false
             matrix:

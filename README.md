@@ -60,6 +60,12 @@ be disabled. This can be done by providing the
 `nvidia-container-runtime-hook-config.toml` file to the Docker runtime hook
 using the `nvidia-container-runtime-hook` wrapper provided in this repository.
 
+## Automatic Pruning of Docker Images
+
+Over time, the CI setup will accumulate unused Docker container images.
+These can fill up a drive pretty quickly, and it is recommended to prune them periodically.
+Use the `setup-cron.sh` script to install a crontab that periodically prunes old and unused images.
+
 ## Interaction with celerity-runtime CMake
 
 Building and running examples against the installed Celerity Runtime is a bit finicky because which examples can be run depends on the exported configuration (e.g. `CELERITY_FEATURE_SIMPLE_SCALAR_REDUCTIONS`).

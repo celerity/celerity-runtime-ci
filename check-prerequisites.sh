@@ -14,6 +14,10 @@ fi
 
 ! SHIM_CHECK=$(CELERITY_DOCKER_SHIM_CHECK=1 docker ps 2>&1 1>/dev/null)
 if [ "$SHIM_CHECK" != "Docker shimmed" ]; then
-    echo "Docker is not correctly shimmed for Celerity CI"
+    echo "Docker is not correctly shimmed for Celerity CI" 2>&1
     exit 1
+fi
+
+if ! grep -q "docker-prune.sh" <<< "$(crontab -l)"; then
+    echo "Warning: Crontab for Docker pruning not found" 2>&1
 fi

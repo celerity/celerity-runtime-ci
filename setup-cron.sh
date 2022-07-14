@@ -14,7 +14,7 @@ CMD=$1
 SCRIPT_DIR=$(dirname "$(readlink -fn "$0")")
 PRUNE_SCRIPT="$SCRIPT_DIR/docker-prune.sh"
 ! CRONTAB=$(crontab -l 2>&1)
-! EXISTS=$(grep "$PRUNE_SCRIPT" <<< "$CRONTAB")
+! EXISTS=$(grep -F "$PRUNE_SCRIPT" <<< "$CRONTAB")
 
 if [[ $CMD == "install" ]]; then
     if [[ -n $EXISTS ]]; then
@@ -33,6 +33,6 @@ else
     fi
 
     echo "Removing entry from user crontab: $EXISTS"
-    grep -v "$EXISTS" <<< "$(crontab -l)" | crontab -
+    grep -vF "$EXISTS" <<< "$(crontab -l)" | crontab -
 fi
 

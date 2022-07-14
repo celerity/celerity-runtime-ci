@@ -18,6 +18,6 @@ if [ "$SHIM_CHECK" != "Docker shimmed" ]; then
     exit 1
 fi
 
-if ! grep -q "docker-prune.sh" <<< "$(crontab -l)"; then
+if ! grep -qF "docker-prune.sh" <<< "$(crontab -l)"; then
     echo "Warning: Crontab for Docker pruning not found" 2>&1
 fi

@@ -140,9 +140,10 @@ build-sycl-from-distribution() {
     TARBALL="$1"
 
     # log to a file to avoid choking tar on head -1 and triggering set -e
-    tar tf "$TARBALL" > /tmp/tarlist
-    PACKAGE_NAME="$(head -1 /tmp/tarlist | cut -d/ -f1)"
+    tar tf "$TARBALL" > tarlist
+    PACKAGE_NAME="$(head -1 tarlist | cut -d/ -f1)"
     VERSION="Ubuntu ${UBUNTU} ${CUDA+CUDA $CUDA }${INTEL_COMPUTE_RT+Intel Compute Runtime $INTEL_COMPUTE_RT }$SYCL $REF"
+    rm -f tarlist
 
     echo "Building $VERSION" >&2
 

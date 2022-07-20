@@ -51,15 +51,17 @@ fi
 
 ROOT_DIR="$(readlink -f "$(dirname "$0")")"
 SYCL_DIR="$ROOT_DIR/$SYCL"
+
+TMP_DIR="$ROOT_DIR/tmp"
+mkdir -p "$TMP_DIR"
+
 build-sycl-from-source() {
     GIT_REMOTE="$1"
 
     rm -rf install/opt
     mkdir -p install/opt
 
-    SRC_BASE_DIR="$HOME/celerity-src"
-    mkdir -p "$SRC_BASE_DIR"
-    SRC_DIR="$SRC_BASE_DIR/$SYCL"
+    SRC_DIR="$TMP_DIR/$SYCL"
     if [ -e "$SRC_DIR" ]; then
         cd "$SRC_DIR"
         git fetch --all >&2
@@ -140,10 +142,9 @@ build-sycl-from-distribution() {
     TARBALL="$1"
 
     # log to a file to avoid choking tar on head -1 and triggering set -e
-    tar tf "$TARBALL" > tarlist
-    PACKAGE_NAME="$(head -1 tarlist | cut -d/ -f1)"
+    tar tf "$TARBALL" > "$TMP_DIR/tarlist"
+    PACKAGE_NAME="$(head -1 "$TMP_DIR/tarlist" | cut -d/ -f1)"
     VERSION="Ubuntu ${UBUNTU} ${CUDA+CUDA $CUDA }${INTEL_COMPUTE_RT+Intel Compute Runtime $INTEL_COMPUTE_RT }$SYCL $REF"
-    rm -f tarlist
 
     echo "Building $VERSION" >&2
 

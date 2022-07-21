@@ -56,6 +56,8 @@ TMP_DIR="$ROOT_DIR/tmp"
 mkdir -p "$TMP_DIR"
 
 build-sycl-from-source() {
+    set -e  # bash resets -e inside command substitutions
+
     GIT_REMOTE="$1"
 
     rm -rf install/opt
@@ -139,6 +141,8 @@ build-sycl-from-source() {
 }
 
 build-sycl-from-distribution() {
+    set -e
+
     TARBALL="$1"
 
     # log to a file to avoid choking tar on head -1 and triggering set -e
@@ -192,6 +196,8 @@ case "$SYCL" in
 esac
 
 build-project-env() {
+    set -e
+
     PROJECT="$1"
     cp -r common "$PROJECT"-build >&2
     cp "$SYCL/$PROJECT-options.sh" $PROJECT-build

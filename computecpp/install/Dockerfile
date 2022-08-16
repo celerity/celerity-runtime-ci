@@ -1,5 +1,6 @@
 ARG UBUNTU
-FROM ubuntu:${UBUNTU}
+ARG INTEL_COMPUTE_RT
+FROM intel-compute-rt:${INTEL_COMPUTE_RT}-ubuntu${UBUNTU}
 
 COPY common/install-system.sh /root/install-system.sh
 RUN bash /root/install-system.sh cmake clang clang-tidy ccache ocl-icd-opencl-dev \

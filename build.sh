@@ -25,18 +25,32 @@ UBUNTU="$1"
 SYCL="$2"
 REF="$3"
 
+build-intel-compute-rt() {
+    cp -r common intel-compute-rt
+    docker build intel-compute-rt \
+        --build-arg UBUNTU="$UBUNTU" \
+        --build-arg INTEL_COMPUTE_RT="$INTEL_COMPUTE_RT" \
+        --build-arg INTEL_IGC="$INTEL_IGC" \
+        --tag "intel-compute-rt:$INTEL_COMPUTE_RT-ubuntu$UBUNTU" >&2
+}
+
 unset CUDA
+unset INTEL_COMPUTE_RT
+unset INTEL_IGC
 if [ "$SYCL" == hipsycl ]; then
     case "$UBUNTU" in
         20.04) CUDA=11.0.3;;
         22.04) CUDA=11.7.0;;
         *) echo "I don't know which CUDA version to select for Ubuntu $UBUNTU" >&2; exit 1;;
     esac
-fi
+else
+    INTEL_COMPUTE_RT=22.31.23852
+    INTEL_IGC=1.0.11485
+    build-intel-compute-rt
+fi 
 
 ROOT_DIR="$(readlink -f "$(dirname "$0")")"
 SYCL_DIR="$ROOT_DIR/$SYCL"
-
 build-sycl-from-source() {
     GIT_REMOTE="$1"
 
@@ -62,7 +76,7 @@ build-sycl-from-source() {
     git -c advice.detachedHead=false checkout --force "$COMMIT_ID" >&2
     git clean -fdx >&2
     git submodule update --init --recursive >&2
-    VERSION="Ubuntu ${UBUNTU} ${CUDA+CUDA $CUDA }$SYCL $REF @ $(git log --format=format:"%H | %ci" -1)"
+    VERSION="Ubuntu ${UBUNTU} ${CUDA+CUDA $CUDA }${INTEL_COMPUTE_RT+Intel Compute Runtime $INTEL_COMPUTE_RT }$SYCL $REF @ $(git log --format=format:"%H | %ci" -1)"
 
     cd "$SYCL_DIR"
     echo "Building $VERSION" >&2
@@ -87,7 +101,10 @@ build-sycl-from-source() {
     echo "Creating SYCL build container ($BUILD_IMAGE_TAG)" >&2
     cp -r ../common build >&2
     docker build build \
-        --build-arg=UBUNTU="$UBUNTU" ${CUDA+"--build-arg=CUDA=$CUDA"} \
+        --build-arg=UBUNTU="$UBUNTU" \
+        ${CUDA+"--build-arg=CUDA=$CUDA"} \
+        ${INTEL_COMPUTE_RT+"--build-arg=INTEL_COMPUTE_RT=$INTEL_COMPUTE_RT"} \
+        ${INTEL_IGC+"--build-arg=INTEL_IGC=$INTEL_IGC"} \
         --tag "$BUILD_IMAGE_TAG" >&2
     BUILD_IMAGE_CONTAINER_ID=$(docker create \
         --mount "type=bind,src=$SRC_DIR,dst=/src" \
@@ -110,7 +127,10 @@ build-sycl-from-source() {
     cp -r ../common install >&2
     echo "$VERSION" > install/VERSION
     docker build \
-        --build-arg=UBUNTU="$UBUNTU" ${CUDA+"--build-arg=CUDA=$CUDA"} \
+        --build-arg=UBUNTU="$UBUNTU" \
+        ${CUDA+"--build-arg=CUDA=$CUDA"} \
+        ${INTEL_COMPUTE_RT+"--build-arg=INTEL_COMPUTE_RT=$INTEL_COMPUTE_RT"} \
+        ${INTEL_IGC+"--build-arg=INTEL_IGC=$INTEL_IGC"} \
         --tag "$COMMIT_TAG" --tag "$GIT_REF_TAG" install >&2
 
     echo "$GIT_REF_TAG" # stdout, captured by caller
@@ -122,7 +142,7 @@ build-sycl-from-distribution() {
     # log to a file to avoid choking tar on head -1 and triggering set -e
     tar tf "$TARBALL" > /tmp/tarlist
     PACKAGE_NAME="$(head -1 /tmp/tarlist | cut -d/ -f1)"
-    VERSION="Ubuntu ${UBUNTU} ${CUDA+CUDA $CUDA }$SYCL $REF"
+    VERSION="Ubuntu ${UBUNTU} ${CUDA+CUDA $CUDA }${INTEL_COMPUTE_RT+Intel Compute Runtime $INTEL_COMPUTE_RT }$SYCL $REF"
 
     echo "Building $VERSION" >&2
 
@@ -146,7 +166,10 @@ build-sycl-from-distribution() {
     cp -r ../common install >&2
     echo "$VERSION" > install/VERSION
     docker build \
-        --build-arg=UBUNTU="$UBUNTU" ${CUDA+"--build-arg=CUDA=$CUDA"} \
+        --build-arg=UBUNTU="$UBUNTU" \
+        ${CUDA+"--build-arg=CUDA=$CUDA"} \
+        ${INTEL_COMPUTE_RT+"--build-arg=INTEL_COMPUTE_RT=$INTEL_COMPUTE_RT"} \
+        ${INTEL_IGC+"--build-arg=INTEL_IGC=$INTEL_IGC"} \
         --tag "$SYMBOLIC_TAG" install >&2
 
     echo "$SYMBOLIC_TAG" # stdout, captured by caller
@@ -179,4 +202,3 @@ build-project-env() {
 cd "$ROOT_DIR"
 build-project-env celerity
 if [ "$UBUNTU" == 22.04 ] && [ "$SYCL" == hipsycl ]; then build-project-env ndzip; fi
-

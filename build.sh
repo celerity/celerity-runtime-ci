@@ -87,7 +87,7 @@ build-sycl-from-source() {
 
     BUILD_IMAGE_TAG="$SYCL-build/ubuntu$UBUNTU"
     BASE_TAG="$SYCL:ubuntu$UBUNTU"
-    COMMIT_TAG="$BASE_TAG-$COMMIT_ID"
+    COMMIT_TAG="$BASE_TAG-${COMMIT_ID:0:8}"
     GIT_REF_TAG="$BASE_TAG-$(echo -n "$REF" | tr -sc 'A-Za-z0-9.' '-')"
 
     EXISTING_IMAGE_ID="$(docker images -f "reference=$COMMIT_TAG" -q)"

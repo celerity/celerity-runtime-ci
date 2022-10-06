@@ -47,16 +47,17 @@ else
     INTEL_COMPUTE_RT=22.31.23852
     INTEL_IGC=1.0.11485
     build-intel-compute-rt
-fi 
+fi
 
 ROOT_DIR="$(readlink -f "$(dirname "$0")")"
 SYCL_DIR="$ROOT_DIR/$SYCL"
 
 TMP_DIR="$ROOT_DIR/tmp"
 mkdir -p "$TMP_DIR"
+SYCL_TAGS_FILE="$TMP_DIR/sycl-image-tags"
 
 build-sycl-from-source() {
-    set -e  # bash resets -e inside command substitutions
+    set -eu -o pipefail
 
     GIT_REMOTE="$1"
 
@@ -94,7 +95,7 @@ build-sycl-from-source() {
     if [ -n "$EXISTING_IMAGE_ID" ] && ! [ -n "${FORCE+x}" ]; then
         docker tag "$COMMIT_TAG" "$GIT_REF_TAG" >&2
         echo "Image $GIT_REF_TAG (aka $EXISTING_IMAGE_ID) already exists" >&2
-        echo "$GIT_REF_TAG" # stdout, captured by caller
+        echo -e "$COMMIT_TAG\n$GIT_REF_TAG" > "$SYCL_TAGS_FILE"
         exit 0
     fi
 
@@ -137,11 +138,11 @@ build-sycl-from-source() {
         ${INTEL_IGC+"--build-arg=INTEL_IGC=$INTEL_IGC"} \
         --tag "$COMMIT_TAG" --tag "$GIT_REF_TAG" install >&2
 
-    echo "$GIT_REF_TAG" # stdout, captured by caller
+    echo -e "$COMMIT_TAG\n$GIT_REF_TAG" > "$SYCL_TAGS_FILE"
 }
 
 build-sycl-from-distribution() {
-    set -e
+    set -eu -o pipefail
 
     TARBALL="$1"
 
@@ -158,7 +159,7 @@ build-sycl-from-distribution() {
     EXISTING_IMAGE_ID="$(docker images -f "reference=$SYMBOLIC_TAG" -q)"
     if [ -n "$EXISTING_IMAGE_ID" ] && ! [ -n "${FORCE+x}" ]; then
         echo "Image $SYMBOLIC_TAG (aka $EXISTING_IMAGE_ID) already exists" >&2
-        echo "$SYMBOLIC_TAG" # stdout, captured by caller
+        echo "$SYMBOLIC_TAG" > "$SYCL_TAGS_FILE"
         exit 0
     fi
 
@@ -178,32 +179,38 @@ build-sycl-from-distribution() {
         ${INTEL_IGC+"--build-arg=INTEL_IGC=$INTEL_IGC"} \
         --tag "$SYMBOLIC_TAG" install >&2
 
-    echo "$SYMBOLIC_TAG" # stdout, captured by caller
+    echo "$SYMBOLIC_TAG" > "$SYCL_TAGS_FILE"
 }
 
 cd "$SYCL_DIR"
 case "$SYCL" in
-    hipsycl) SYCL_IMAGE=$(build-sycl-from-source "https://github.com/illuhad/hipSYCL.git");;
-    dpcpp) SYCL_IMAGE=$(build-sycl-from-source "https://github.com/intel/llvm.git");;
+    # run build-sycl-* functions in subshells to make `trap EXIT` work
+    hipsycl) (build-sycl-from-source "https://github.com/illuhad/hipSYCL.git");;
+    dpcpp) (build-sycl-from-source "https://github.com/intel/llvm.git");;
     computecpp)
         set -- ${REF//-/ }  # split args on -
         DISTRIBUTION="computecpp${2:+"_$2"}-ce"
         VERSION="$1"
         SYSTEM=x86_64-linux-gnu
-        SYCL_IMAGE=$(build-sycl-from-distribution "$(pwd)/dist/$DISTRIBUTION-$VERSION-$SYSTEM.tar"*)
+        (build-sycl-from-distribution "$(pwd)/dist/$DISTRIBUTION-$VERSION-$SYSTEM.tar"*)
         ;;
     *) usage;;
 esac
 
 build-project-env() {
-    set -e
-
     PROJECT="$1"
+
+    readarray -t SYCL_TAGS < "$SYCL_TAGS_FILE"
+    declare -a TAG_FLAGS
+    for SYCL_TAG in "${SYCL_TAGS[@]}"; do
+        TAG_FLAGS+=(--tag "$PROJECT-build/${SYCL_TAG}")
+    done
+
     cp -r common "$PROJECT"-build >&2
     cp "$SYCL/$PROJECT-options.sh" $PROJECT-build
     docker build \
-        --build-arg=SYCL_IMAGE="$SYCL_IMAGE" \
-        --tag "$PROJECT-build/$SYCL_IMAGE" \
+        --build-arg=SYCL_IMAGE="${SYCL_TAGS[0]}" \
+        "${TAG_FLAGS[@]}" \
         $PROJECT-build >&2
 }
 

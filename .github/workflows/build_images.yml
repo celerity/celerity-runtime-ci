@@ -19,7 +19,7 @@ jobs:
         steps:
             - uses: actions/checkout@v2
               with:
-                  lfs: true
+                  lfs: false
             - name: Check whether system is setup correctly for building and running Celerity CI containers
               run: bash ./check-prerequisites.sh
 
@@ -57,7 +57,7 @@ jobs:
         steps:
             - uses: actions/checkout@v2
               with:
-                  lfs: true
+                  lfs: ${{ matrix.sycl == 'computecpp' }}
             - name: Build Docker container for ${{ matrix.sycl }} ${{ matrix.sycl-version }} on ${{ matrix.ubuntu-version }}
               run: bash ./build.sh ${{ matrix.ubuntu-version }} ${{ matrix.sycl }} ${{ matrix.sycl-version }}
               if: ${{ github.event_name == 'schedule' }}

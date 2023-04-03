@@ -10,3 +10,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y autoremove \
     && apt-get -q clean \
     && rm -rf /var/lib/apt/lists/*
+
+COPY cuda-noinline.patch /root
+RUN cd /usr/local/cuda \
+    && patch -p1 < /root/cuda-noinline.patch

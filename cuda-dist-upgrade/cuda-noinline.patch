@@ -1,0 +1,11 @@
+--- a/include/crt/host_defines.h	2023-04-03 14:40:16.471254404 +0200
++++ b/include/crt/host_defines.h	2023-03-23 22:07:22.000000000 +0100
+@@ -70,7 +70,7 @@
+ #define __no_return__ \
+         __attribute__((noreturn))
+         
+-#if defined(__CUDACC__) || defined(__CUDA_ARCH__) || defined(__CUDA_LIBDEVICE__)
++#if (defined(__CUDACC__) || defined(__CUDA_ARCH__) || defined(__CUDA_LIBDEVICE__)) && !defined(__clang__)
+ /* gcc allows users to define attributes with underscores, 
+    e.g., __attribute__((__noinline__)).
+    Consider a non-CUDA source file (e.g. .cpp) that has the 

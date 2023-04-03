@@ -34,13 +34,32 @@ build-intel-compute-rt() {
         --tag "intel-compute-rt:$INTEL_COMPUTE_RT-ubuntu$UBUNTU" >&2
 }
 
+build-cuda-dist-upgrade() {
+    if [ "$UBUNTU" != 23.04 ]; then
+        echo "I don't know the codename of Ubuntu $UBUNTU"
+        exit 1
+    fi
+
+    UBUNTU_BASE=22.04
+    FROM_CODENAME=jammy
+    TO_CODENAME=lunar
+
+    docker build cuda-dist-upgrade \
+        --build-arg UBUNTU_BASE="$UBUNTU_BASE" \
+        --build-arg CUDA="$CUDA" \
+        --build-arg FROM_CODENAME="$FROM_CODENAME" \
+        --build-arg TO_CODENAME="$TO_CODENAME" \
+        --tag nvidia/cuda:${CUDA}-devel-ubuntu${UBUNTU}
+}
+
 unset CUDA
 unset INTEL_COMPUTE_RT
 unset INTEL_IGC
 if [ "$SYCL" == hipsycl ]; then
     case "$UBUNTU" in
         20.04) CUDA=11.0.3;;
-        22.04) CUDA=12.1.0;;
+        22.04) CUDA=11.8.0;;
+        23.04) CUDA=12.1.0; build-cuda-dist-upgrade;;
         *) echo "I don't know which CUDA version to select for Ubuntu $UBUNTU" >&2; exit 1;;
     esac
 else

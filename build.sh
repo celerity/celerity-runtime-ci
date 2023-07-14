@@ -4,7 +4,6 @@ set -eu -o pipefail
 
 usage() {
     echo "Usage: $0 [-f|--force] <ubuntu-version> hipsycl|dpcpp <git-ref>" >&2
-    echo "       $0 [-f|--force] <ubuntu-version> computecpp <version>" >&2
     exit 1
 }
 
@@ -160,59 +159,11 @@ build-sycl-from-source() {
     echo -e "$COMMIT_TAG\n$GIT_REF_TAG" > "$SYCL_TAGS_FILE"
 }
 
-build-sycl-from-distribution() {
-    set -eu -o pipefail
-
-    TARBALL="$1"
-
-    # log to a file to avoid choking tar on head -1 and triggering set -e
-    tar tf "$TARBALL" > "$TMP_DIR/tarlist"
-    PACKAGE_NAME="$(head -1 "$TMP_DIR/tarlist" | cut -d/ -f1)"
-    VERSION="Ubuntu ${UBUNTU} ${CUDA+CUDA $CUDA }${INTEL_COMPUTE_RT+Intel Compute Runtime $INTEL_COMPUTE_RT }$SYCL $REF"
-
-    echo "Building $VERSION" >&2
-
-    BASE_TAG="$SYCL:ubuntu$UBUNTU"
-    SYMBOLIC_TAG="$BASE_TAG-$(echo -n "$REF" | tr -sc 'A-Za-z0-9.' '-')"
-
-    EXISTING_IMAGE_ID="$(docker images -f "reference=$SYMBOLIC_TAG" -q)"
-    if [ -n "$EXISTING_IMAGE_ID" ] && ! [ -n "${FORCE+x}" ]; then
-        echo "Image $SYMBOLIC_TAG (aka $EXISTING_IMAGE_ID) already exists" >&2
-        echo "$SYMBOLIC_TAG" > "$SYCL_TAGS_FILE"
-        exit 0
-    fi
-
-    rm -rf install/opt >&2
-    mkdir -p install/opt >&2
-    cd install/opt
-    tar xf "$TARBALL" >&2
-    mv "$PACKAGE_NAME" "$SYCL" >&2
-    cd ../..
-
-    cp -r ../common install >&2
-    echo "$VERSION" > install/VERSION
-    docker build \
-        --build-arg=UBUNTU="$UBUNTU" \
-        ${CUDA+"--build-arg=CUDA=$CUDA"} \
-        ${INTEL_COMPUTE_RT+"--build-arg=INTEL_COMPUTE_RT=$INTEL_COMPUTE_RT"} \
-        ${INTEL_IGC+"--build-arg=INTEL_IGC=$INTEL_IGC"} \
-        --tag "$SYMBOLIC_TAG" install >&2
-
-    echo "$SYMBOLIC_TAG" > "$SYCL_TAGS_FILE"
-}
-
 cd "$SYCL_DIR"
 case "$SYCL" in
     # run build-sycl-* functions in subshells to make `trap EXIT` work
     hipsycl) (build-sycl-from-source "https://github.com/illuhad/hipSYCL.git");;
     dpcpp) (build-sycl-from-source "https://github.com/intel/llvm.git");;
-    computecpp)
-        set -- ${REF//-/ }  # split args on -
-        DISTRIBUTION="computecpp${2:+"_$2"}-ce"
-        VERSION="$1"
-        SYSTEM=x86_64-linux-gnu
-        (build-sycl-from-distribution "$(pwd)/dist/$DISTRIBUTION-$VERSION-$SYSTEM.tar"*)
-        ;;
     *) usage;;
 esac
 

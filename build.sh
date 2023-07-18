@@ -29,6 +29,7 @@ build-intel-compute-rt() {
     docker build intel-compute-rt \
         --build-arg UBUNTU="$UBUNTU" \
         --build-arg INTEL_COMPUTE_RT="$INTEL_COMPUTE_RT" \
+        --build-arg ONEAPI_LEVEL_ZERO="$ONEAPI_LEVEL_ZERO" \
         --build-arg INTEL_IGC="$INTEL_IGC" \
         --tag "intel-compute-rt:$INTEL_COMPUTE_RT-ubuntu$UBUNTU" >&2
 }
@@ -53,6 +54,7 @@ build-cuda-dist-upgrade() {
 
 unset CUDA
 unset INTEL_COMPUTE_RT
+unset ONEAPI_LEVEL_ZERO
 unset INTEL_IGC
 if [ "$SYCL" == hipsycl ]; then
     case "$UBUNTU" in
@@ -63,6 +65,7 @@ if [ "$SYCL" == hipsycl ]; then
     esac
 else
     INTEL_COMPUTE_RT=23.22.26516.18
+    ONEAPI_LEVEL_ZERO=1.11.0
     INTEL_IGC=1.0.14062.11
     build-intel-compute-rt
 fi
@@ -127,6 +130,7 @@ build-sycl-from-source() {
         --build-arg=UBUNTU="$UBUNTU" \
         ${CUDA+"--build-arg=CUDA=$CUDA"} \
         ${INTEL_COMPUTE_RT+"--build-arg=INTEL_COMPUTE_RT=$INTEL_COMPUTE_RT"} \
+        ${ONEAPI_LEVEL_ZERO+"--build-arg=ONEAPI_LEVEL_ZERO=$ONEAPI_LEVEL_ZERO"} \
         ${INTEL_IGC+"--build-arg=INTEL_IGC=$INTEL_IGC"} \
         --tag "$BUILD_IMAGE_TAG" >&2
     BUILD_IMAGE_CONTAINER_ID=$(docker create \
@@ -153,6 +157,7 @@ build-sycl-from-source() {
         --build-arg=UBUNTU="$UBUNTU" \
         ${CUDA+"--build-arg=CUDA=$CUDA"} \
         ${INTEL_COMPUTE_RT+"--build-arg=INTEL_COMPUTE_RT=$INTEL_COMPUTE_RT"} \
+        ${ONEAPI_LEVEL_ZERO+"--build-arg=ONEAPI_LEVEL_ZERO=$ONEAPI_LEVEL_ZERO"} \
         ${INTEL_IGC+"--build-arg=INTEL_IGC=$INTEL_IGC"} \
         --tag "$COMMIT_TAG" --tag "$GIT_REF_TAG" install >&2
 

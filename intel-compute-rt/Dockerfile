@@ -6,10 +6,12 @@ RUN bash /root/install-system.sh ca-certificates curl python3 ocl-icd-libopencl1
 
 # FROM clears all ARG-bindings, so bind $INTEL_COMPUTE_RT and $INTEL_IGC here
 ARG INTEL_COMPUTE_RT
+ARG ONEAPI_LEVEL_ZERO
 ARG INTEL_IGC
 RUN mkdir /root/debs \
     && cd /root/debs \
     && bash /root/download-assets.sh intel/intel-graphics-compiler igc-${INTEL_IGC} .deb \
+    && bash /root/download-assets.sh oneapi-src/level-zero v${ONEAPI_LEVEL_ZERO} .deb \
     && bash /root/download-assets.sh intel/compute-runtime ${INTEL_COMPUTE_RT} .deb .ddeb .sum \
     && sha256sum -c *.sum \
     && dpkg -i *.deb *.ddeb \

@@ -29,8 +29,8 @@ build-intel-compute-rt() {
     docker build intel-compute-rt \
         --build-arg UBUNTU="$UBUNTU" \
         --build-arg INTEL_COMPUTE_RT="$INTEL_COMPUTE_RT" \
-        --build-arg ONEAPI_LEVEL_ZERO="$ONEAPI_LEVEL_ZERO" \
         --build-arg INTEL_IGC="$INTEL_IGC" \
+        --build-arg ONEAPI_LEVEL_ZERO="$ONEAPI_LEVEL_ZERO" \
         --tag "intel-compute-rt:$INTEL_COMPUTE_RT-ubuntu$UBUNTU" >&2
 }
 
@@ -54,8 +54,8 @@ build-cuda-dist-upgrade() {
 
 unset CUDA
 unset INTEL_COMPUTE_RT
-unset ONEAPI_LEVEL_ZERO
 unset INTEL_IGC
+unset ONEAPI_LEVEL_ZERO
 if [ "$SYCL" == hipsycl ]; then
     case "$UBUNTU" in
         20.04) CUDA=11.0.3;;
@@ -65,8 +65,11 @@ if [ "$SYCL" == hipsycl ]; then
     esac
 else
     INTEL_COMPUTE_RT=23.22.26516.18
-    ONEAPI_LEVEL_ZERO=1.11.0
     INTEL_IGC=1.0.14062.11
+    case "$UBUNTU" in
+        22.04) ONEAPI_LEVEL_ZERO=1.11.0;;
+        *) ONEAPI_LEVEL_ZERO=1.9.9;;
+    esac
     build-intel-compute-rt
 fi
 
@@ -130,8 +133,8 @@ build-sycl-from-source() {
         --build-arg=UBUNTU="$UBUNTU" \
         ${CUDA+"--build-arg=CUDA=$CUDA"} \
         ${INTEL_COMPUTE_RT+"--build-arg=INTEL_COMPUTE_RT=$INTEL_COMPUTE_RT"} \
-        ${ONEAPI_LEVEL_ZERO+"--build-arg=ONEAPI_LEVEL_ZERO=$ONEAPI_LEVEL_ZERO"} \
         ${INTEL_IGC+"--build-arg=INTEL_IGC=$INTEL_IGC"} \
+        ${ONEAPI_LEVEL_ZERO+"--build-arg=ONEAPI_LEVEL_ZERO=$ONEAPI_LEVEL_ZERO"} \
         --tag "$BUILD_IMAGE_TAG" >&2
     BUILD_IMAGE_CONTAINER_ID=$(docker create \
         --mount "type=bind,src=$SRC_DIR,dst=/src" \
@@ -157,8 +160,8 @@ build-sycl-from-source() {
         --build-arg=UBUNTU="$UBUNTU" \
         ${CUDA+"--build-arg=CUDA=$CUDA"} \
         ${INTEL_COMPUTE_RT+"--build-arg=INTEL_COMPUTE_RT=$INTEL_COMPUTE_RT"} \
-        ${ONEAPI_LEVEL_ZERO+"--build-arg=ONEAPI_LEVEL_ZERO=$ONEAPI_LEVEL_ZERO"} \
         ${INTEL_IGC+"--build-arg=INTEL_IGC=$INTEL_IGC"} \
+        ${ONEAPI_LEVEL_ZERO+"--build-arg=ONEAPI_LEVEL_ZERO=$ONEAPI_LEVEL_ZERO"} \
         --tag "$COMMIT_TAG" --tag "$GIT_REF_TAG" install >&2
 
     echo -e "$COMMIT_TAG\n$GIT_REF_TAG" > "$SYCL_TAGS_FILE"

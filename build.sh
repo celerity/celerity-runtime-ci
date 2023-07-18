@@ -62,8 +62,8 @@ if [ "$SYCL" == hipsycl ]; then
         *) echo "I don't know which CUDA version to select for Ubuntu $UBUNTU" >&2; exit 1;;
     esac
 else
-    INTEL_COMPUTE_RT=22.31.23852
-    INTEL_IGC=1.0.11485
+    INTEL_COMPUTE_RT=23.22.26516.18
+    INTEL_IGC=1.0.14062.11
     build-intel-compute-rt
 fi
 

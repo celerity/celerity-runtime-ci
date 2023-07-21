@@ -2,7 +2,7 @@
 set -o errexit -o pipefail -o noclobber -o nounset
 
 # Cannot use $HOME or ~ because HOME is overwritten by the GitHub runner for some commands
-DOCKER_EXE="$(getent passwd "$USER" | cut -d : -f 6)/bin/docker"
+DOCKER_EXE="$(getent passwd "${USER:-$LOGNAME}" | cut -d : -f 6)/bin/docker"
 
 if [ -v "CELERITY_DOCKER_SHIM_CHECK" ] && [ "$CELERITY_DOCKER_SHIM_CHECK" -eq 1 ]; then
     if [ ! -x "$DOCKER_EXE" ]; then

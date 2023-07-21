@@ -1,0 +1,30 @@
+#!/bin/bash
+set -o errexit -o pipefail -o noclobber -o nounset
+
+DOCKER_EXE="%DOCKER%"
+
+exec >> /tmp/docker-prune-${USER:-$LOGNAME}.log
+exec 2>&1
+echo "Prune script running on $(date)"
+
+# TODO: Instead of hard coding, we may also want to configure these upon script installation
+export XDG_RUNTIME_DIR="/run/user/$UID"
+export DOCKER_HOST="unix:///run/user/$UID/docker.sock"
+
+#
+# Prunes dangling and old (> 1 month) Docker images and other unused data.
+#
+
+# Delete old images (will not delete images that are still used by existing containers or child images)
+echo "Pruning images older than 1 month..."
+! "$DOCKER_EXE" images 2>&1 | \
+    awk -F '[[:space:]][[:space:]]+' '$4 ~ /[5-9] weeks ago/ || $4 ~ /[1-9] months ago/ {print $3}' | \
+    xargs "$DOCKER_EXE" rmi
+
+# Prune dangling images
+echo "Pruning dangling images..."
+! "$DOCKER_EXE" image prune --force
+
+# Prune other unused system data
+echo "Pruning other unused data..."
+! "$DOCKER_EXE" system prune --force

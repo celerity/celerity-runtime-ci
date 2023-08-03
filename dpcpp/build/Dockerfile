@@ -9,5 +9,6 @@ COPY common/build-with-cmake.sh build-dpcpp.sh /root/
 
 RUN mkdir /ccache && \
     mkdir -p /opt/dpcpp
-ENV CCACHE_DIR=/ccache CCACHE_MAXSIZE=10G
+ENV CCACHE_DIR=/ccache \
+    CCACHE_MAXSIZE=10G
 CMD bash /root/build-dpcpp.sh

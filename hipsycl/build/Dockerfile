@@ -10,5 +10,6 @@ COPY common/build-with-cmake.sh build-hipsycl.sh /root/
 
 RUN mkdir /ccache && \
     mkdir -p /opt/hipsycl
-ENV CCACHE_DIR=/ccache
+ENV CCACHE_DIR=/ccache \
+    CCACHE_MAXSIZE=10G
 CMD sh /root/build-hipsycl.sh

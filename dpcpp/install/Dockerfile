@@ -14,5 +14,6 @@ RUN echo /opt/dpcpp/lib > /etc/ld.so.conf.d/dpcpp.conf \
 
 # CCACHE_DEPEND=1 works around https://github.com/intel/llvm/issues/5260
 ENV PATH="/opt/dpcpp/bin:${PATH}" \
-    CCACHE_DIR=/ccache/dpcpp \
-    CCACHE_DEPEND=1
+    CCACHE_DIR=/ccache \
+    CCACHE_DEPEND=1 \
+    CCACHE_MAXSIZE=10G

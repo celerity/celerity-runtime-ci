@@ -21,4 +21,6 @@ RUN bash /root/install-system.sh cmake ccache clang clang-tidy libomp-dev \
 COPY opt/hipsycl /opt/hipsycl
 COPY VERSION /VERSION
 
-ENV PATH="/opt/hipsycl/bin:${PATH}"
+ENV PATH="/opt/hipsycl/bin:${PATH}" \
+    CCACHE_DIR=/ccache \
+    CCACHE_MAXSIZE=10G

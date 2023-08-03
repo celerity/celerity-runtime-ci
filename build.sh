@@ -60,7 +60,7 @@ if [ "$SYCL" == hipsycl ]; then
     case "$UBUNTU" in
         20.04) CUDA=11.0.3;;
         22.04) CUDA=11.8.0;;
-        23.04) CUDA=12.1.0; build-cuda-dist-upgrade;;
+        23.04) CUDA=12.2.0; build-cuda-dist-upgrade;;
         *) echo "I don't know which CUDA version to select for Ubuntu $UBUNTU" >&2; exit 1;;
     esac
 else

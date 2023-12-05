@@ -2,6 +2,7 @@
 
 set -eu
 rm -rf /opt/hipsycl/*
+bash /patches/apply.sh
 bash ~/build-with-cmake.sh /root/build /src --target install -- \
     -DCMAKE_PREFIX_PATH=/usr/lib/llvm-10/lib/cmake/llvm \
     -DWITH_CUDA_BACKEND=YES \

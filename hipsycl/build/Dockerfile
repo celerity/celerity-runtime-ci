@@ -9,6 +9,9 @@ RUN bash /root/install-system.sh clang libclang-dev llvm-dev libomp-dev \
 
 COPY common/build-with-cmake.sh build-hipsycl.sh /root/
 
+# HACK: Until https://github.com/AdaptiveCpp/AdaptiveCpp/pull/1276 is merged, we patch it manually
+COPY patches /patches/
+
 RUN mkdir /ccache && \
     mkdir -p /opt/hipsycl
 ENV CCACHE_DIR=/ccache \

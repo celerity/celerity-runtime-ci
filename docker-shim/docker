@@ -17,24 +17,12 @@ if [ -v "CELERITY_DOCKER_SHIM_CHECK" ] && [ "$CELERITY_DOCKER_SHIM_CHECK" -eq 1 
     exit 0
 fi
 
-# We shim "docker pull" because GitHub only allows to run images
-# hosted at a registry (and we don't want to host our own registry)
-# As long as the image:tag is available locally, after fake pulling,
-# everything works as expected.
-if [ $# -gt 1 ] && [ "$1" == "pull" ]; then
-    # We still want to produce an error if the image does not exist
-    ! "$DOCKER_EXE" image inspect "$2" &> /dev/null
-    if [ "${PIPESTATUS[0]}" -ne 0 ]; then
-        echo "Docker shim: Image '$2' does not exist locally." 1>&2
-        exit 1
-    fi
 # We shim "docker create" because we need per-runner (or rather, runner
 # host platform) options. Unfortunately GitHub workflows don't offer
 # any way of setting these options dynamically using expressions.
-elif [ $# -gt 1 ] && [ "$1" == "create" ]; then
+if [ $# -gt 1 ] && [ "$1" == "create" ]; then
     shift
     "$DOCKER_EXE" create $CELERITY_CI_DOCKER_CREATE_OPTIONS "$@"
 else
     "$DOCKER_EXE" "$@"
 fi
-

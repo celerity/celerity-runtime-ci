@@ -54,24 +54,43 @@ jobs:
                       sycl-version: "d2bd9fc7"
                       ubuntu-version: "20.04"
                       platform: "nvidia"
+        permissions:
+            packages: write
         steps:
             - uses: actions/checkout@v2
+            - name: Log into Container registry
+              uses: docker/login-action@v3
+              with:
+                registry: ghcr.io
+                username: ${{ github.actor }}
+                password: ${{ secrets.GITHUB_TOKEN }}
             - name: Build Docker container for ${{ matrix.sycl }} ${{ matrix.sycl-version }} on ${{ matrix.ubuntu-version }}
               run: bash ./build.sh ${{ matrix.ubuntu-version }} ${{ matrix.sycl }} ${{ matrix.sycl-version }}
               if: ${{ github.event_name == 'schedule' }}
             - name: Force-build Docker container for ${{ matrix.sycl }} ${{ matrix.sycl-version }} on ${{ matrix.ubuntu-version }}
               run: bash ./build.sh -f ${{ matrix.ubuntu-version }} ${{ matrix.sycl }} ${{ matrix.sycl-version }}
               if: ${{ github.event_name != 'schedule' }}
-
+            - name: Push Docker container for ${{ matrix.sycl }} ${{ matrix.sycl-version }} on ${{ matrix.ubuntu-version }}
+              run: |
+                IMAGE="celerity-build/${{ matrix.sycl }}:ubuntu${{ matrix.ubuntu-version }}-${{ matrix.sycl-version }}"
+                docker tag $IMAGE ghcr.io/celerity/$IMAGE
+                docker push ghcr.io/celerity/$IMAGE
     build-lint:
         needs: [check-prerequisites]
-        runs-on: slurm-${{ matrix.platform }}
-        strategy:
-            fail-fast: false
-            matrix:
-                # HACK: We need to ensure the lint container image exists on all runners
-                platform: ["intel", "nvidia"]
+        runs-on: [ self-hosted, slurm ]
+        permissions:
+            packages: write
         steps:
             - uses: actions/checkout@v2
+            - name: Log into Container registry
+              uses: docker/login-action@v3
+              with:
+                registry: ghcr.io
+                username: ${{ github.actor }}
+                password: ${{ secrets.GITHUB_TOKEN }}
             - name: Build Celerity linting container
               run: bash ./build-lint.sh
+            - name: Push Celerity linting container
+              run: |
+                docker tag celerity-lint:latest ghcr.io/celerity/celerity-lint:latest
+                docker push ghcr.io/celerity/celerity-lint:latest

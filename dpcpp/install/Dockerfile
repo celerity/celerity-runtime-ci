@@ -3,8 +3,8 @@ ARG INTEL_COMPUTE_RT
 FROM intel-compute-rt:${INTEL_COMPUTE_RT}-ubuntu${UBUNTU}
 
 COPY --chown=root:root common/install-system.sh /root/install-system.sh
-RUN bash /root/install-system.sh curl cmake ccache gdb python3 \
-        ca-certificates python3 libstdc++-dev libgcc-dev libc6-dev ninja-build
+RUN bash /root/install-system.sh curl cmake ccache gdb clang-tidy python3 python3-pip \
+        ca-certificates libstdc++-dev libgcc-dev libc6-dev ninja-build
 
 COPY opt/dpcpp /opt/dpcpp
 COPY VERSION /VERSION

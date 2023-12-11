@@ -58,18 +58,20 @@ jobs:
             packages: write
         steps:
             - uses: actions/checkout@v2
-            - name: Log into Container registry
-              uses: docker/login-action@v3
-              with:
-                registry: ghcr.io
-                username: ${{ github.actor }}
-                password: ${{ secrets.GITHUB_TOKEN }}
             - name: Build Docker container for ${{ matrix.sycl }} ${{ matrix.sycl-version }} on ${{ matrix.ubuntu-version }}
               run: bash ./build.sh ${{ matrix.ubuntu-version }} ${{ matrix.sycl }} ${{ matrix.sycl-version }}
               if: ${{ github.event_name == 'schedule' }}
             - name: Force-build Docker container for ${{ matrix.sycl }} ${{ matrix.sycl-version }} on ${{ matrix.ubuntu-version }}
               run: bash ./build.sh -f ${{ matrix.ubuntu-version }} ${{ matrix.sycl }} ${{ matrix.sycl-version }}
               if: ${{ github.event_name != 'schedule' }}
+            # NOTE: Since `docker login` is stateful, we race with other jobs that run concurrently on the same machine, which may
+            #       result in spurious authentication failures. We reduce the likelihood of this by logging in right before pushing.
+            - name: Log into Container registry
+              uses: docker/login-action@v3
+              with:
+                registry: ghcr.io
+                username: ${{ github.actor }}
+                password: ${{ secrets.GITHUB_TOKEN }}
             - name: Push Docker container for ${{ matrix.sycl }} ${{ matrix.sycl-version }} on ${{ matrix.ubuntu-version }}
               run: |
                 IMAGE="celerity-build/${{ matrix.sycl }}:ubuntu${{ matrix.ubuntu-version }}-${{ matrix.sycl-version }}"
@@ -82,14 +84,15 @@ jobs:
             packages: write
         steps:
             - uses: actions/checkout@v2
+            - name: Build Celerity linting container
+              run: bash ./build-lint.sh
+            # Same concurrency concerns as above.
             - name: Log into Container registry
               uses: docker/login-action@v3
               with:
                 registry: ghcr.io
                 username: ${{ github.actor }}
                 password: ${{ secrets.GITHUB_TOKEN }}
-            - name: Build Celerity linting container
-              run: bash ./build-lint.sh
             - name: Push Celerity linting container
               run: |
                 docker tag celerity-lint:latest ghcr.io/celerity/celerity-lint:latest

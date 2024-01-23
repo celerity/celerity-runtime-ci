@@ -3,7 +3,7 @@
 set -eu -o pipefail
 
 usage() {
-    echo "Usage: $0 [-f|--force] <ubuntu-version> hipsycl|dpcpp <git-ref>" >&2
+    echo "Usage: $0 [-f|--force] <ubuntu-version> hipsycl|dpcpp|simsycl <git-ref>" >&2
     exit 1
 }
 
@@ -55,23 +55,27 @@ build-cuda-dist-upgrade() {
 unset CUDA
 unset INTEL_COMPUTE_RT
 unset INTEL_IGC
-unset ONEAPI_LEVEL_ZERO
-if [ "$SYCL" == hipsycl ]; then
-    case "$UBUNTU" in
-        20.04) CUDA=11.0.3;;
-        22.04) CUDA=11.8.0;;
-        23.04) CUDA=12.2.0; build-cuda-dist-upgrade;;
-        *) echo "I don't know which CUDA version to select for Ubuntu $UBUNTU" >&2; exit 1;;
-    esac
-else
-    INTEL_COMPUTE_RT=23.22.26516.18
-    INTEL_IGC=1.0.14062.11
-    case "$UBUNTU" in
-        22.04) ONEAPI_LEVEL_ZERO=1.11.0;;
-        *) ONEAPI_LEVEL_ZERO=1.9.9;;
-    esac
-    build-intel-compute-rt
-fi
+case "$SYCL" in
+    hipsycl)
+        case "$UBUNTU" in
+            20.04) CUDA=11.0.3;;
+            22.04) CUDA=11.8.0;;
+            23.04) CUDA=12.2.0; build-cuda-dist-upgrade;;
+            *) echo "I don't know which CUDA version to select for Ubuntu $UBUNTU" >&2; exit 1;;
+        esac
+        ;;
+    dpcpp)
+        INTEL_COMPUTE_RT=23.22.26516.18
+        INTEL_IGC=1.0.14062.11
+        case "$UBUNTU" in
+            22.04) ONEAPI_LEVEL_ZERO=1.11.0;;
+            *) ONEAPI_LEVEL_ZERO=1.9.9;;
+        esac
+        build-intel-compute-rt
+        ;;
+    simsycl)
+        ;;
+esac
 
 ROOT_DIR="$(readlink -f "$(dirname "$0")")"
 SYCL_DIR="$ROOT_DIR/$SYCL"
@@ -172,6 +176,7 @@ case "$SYCL" in
     # run build-sycl-* functions in subshells to make `trap EXIT` work
     hipsycl) (build-sycl-from-source "https://github.com/illuhad/hipSYCL.git");;
     dpcpp) (build-sycl-from-source "https://github.com/intel/llvm.git");;
+    simsycl) (build-sycl-from-source "https://github.com/celerity/simsycl.git");;
     *) usage;;
 esac
 

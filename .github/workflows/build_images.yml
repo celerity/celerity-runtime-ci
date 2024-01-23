@@ -54,6 +54,10 @@ jobs:
                       sycl-version: "d2bd9fc7"
                       ubuntu-version: "20.04"
                       platform: "nvidia"
+                    - sycl: "simsycl"
+                      sycl-version: "HEAD"
+                      ubuntu-version: "22.04"
+                      platform: "intel" # CPU-only, but our "intel" partition currently has more spare resources
         permissions:
             packages: write
         steps:

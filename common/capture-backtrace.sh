@@ -30,6 +30,7 @@ fi
 
 CORE_LIMIT_BEFORE=$(ulimit -c)
 ulimit -c unlimited
+export LD_PRELOAD="${CI_LD_PRELOAD-}"
 
 "$@" &  # needs to execute in the background, otherwise we cannot query $!
 PID=$!
@@ -39,6 +40,7 @@ wait $PID
 STATUS=$?
 
 set -e
+unset LD_PRELOAD
 ulimit -c $CORE_LIMIT_BEFORE
 
 if [ $STATUS -lt 128 ]; then

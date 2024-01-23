@@ -30,6 +30,7 @@ for i in "${!PACKAGES[@]}"; do
         libomp-dev) PACKAGES[i]="libomp-$LLVM-dev";;
         libstdc++-dev) PACKAGES[i]="libstdc++-$GCC-dev";;
         libgcc-dev) PACKAGES[i]="libgcc-$GCC-dev";;
+        libstdc++6-dbg) PACKAGES[i]="libstdc++6-$GCC-dbg";;
     esac
 done
 

@@ -28,3 +28,8 @@ EXAMPLES_BUILD_OPTS=(
     -DCMAKE_CXX_COMPILER_LAUNCHER=/usr/bin/ccache
     -DCMAKE_PREFIX_PATH="/opt/simsycl/$BUILD_TYPE;/root/celerity-install"
 )
+
+if [ "$BUILD_TYPE" == debug ]; then
+    CELERITY_BUILD_OPTS+=(-DCMAKE_C_FLAGS=--coverage -DCMAKE_CXX_FLAGS=--coverage)
+    EXAMPLES_BUILD_OPTS+=(-DCMAKE_C_FLAGS=--coverage -DCMAKE_CXX_FLAGS=--coverage)
+fi

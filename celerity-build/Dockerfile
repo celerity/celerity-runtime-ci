@@ -5,6 +5,8 @@ RUN bash /root/install-system.sh git ca-certificates lld gdb pkg-config \
         libopenmpi-dev openmpi-bin libhdf5-openmpi-103 libhdf5-openmpi-dev \
         libc6-dbg libstdc++6-dbg python3 python3-pip
 
+RUN PIP_BREAK_SYSTEM_PACKAGES=true pip3 install cpp-coveralls
+
 COPY common/build-with-cmake.sh build-celerity.sh build-examples.sh \
         common/capture-backtrace.sh celerity-options.sh /root/
 COPY data /data

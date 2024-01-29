@@ -68,11 +68,13 @@ jobs:
                 registry: ghcr.io
                 username: ${{ github.actor }}
                 password: ${{ secrets.GITHUB_TOKEN }}
-            - name: Push Docker container for ${{ matrix.sycl }} ${{ matrix.sycl-version }} on ${{ matrix.ubuntu-version }}
+            - name: Push Docker containers for ${{ matrix.sycl }} ${{ matrix.sycl-version }} on ${{ matrix.ubuntu-version }}
               run: |
-                IMAGE="celerity-build/${{ matrix.sycl }}:ubuntu${{ matrix.ubuntu-version }}-${{ matrix.sycl-version }}"
-                docker tag $IMAGE ghcr.io/celerity/$IMAGE
-                docker push ghcr.io/celerity/$IMAGE
+                for REPOSITORY in "${{ matrix.sycl }}" "celerity-build/${{ matrix.sycl }}"; do
+                  IMAGE="$REPOSITORY:ubuntu${{ matrix.ubuntu-version }}-${{ matrix.sycl-version }}"
+                  docker tag $IMAGE ghcr.io/celerity/$IMAGE
+                  docker push ghcr.io/celerity/$IMAGE
+                done
     build-lint:
         needs: [check-prerequisites]
         runs-on: [ self-hosted, slurm ]

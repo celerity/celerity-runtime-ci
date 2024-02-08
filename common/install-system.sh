@@ -47,7 +47,7 @@ if [ -d "/usr/lib/x86_64-linux-gnu/openmpi/include/openmpi" ]; then
     ln -s /usr/lib/x86_64-linux-gnu/openmpi/include/openmpi /usr/include/openmpi
 fi
 
-if [ -x "/usr/bin/llvm-config-$LLVM" ] && ! [ -f "/usr/bin/llvm-config" ]; then
+if [[ -x "/usr/bin/llvm-config-$LLVM" && ( ! -f "/usr/bin/llvm-config" || $(update-alternatives --list llvm-config) ) ]]; then
     # From https://gist.github.com/hcoona/4e6d681c054e8aa2b877f7363ca5d220
     update-alternatives --quiet \
         --install /usr/bin/llvm-config llvm-config "/usr/bin/llvm-config-$LLVM" 10 \
@@ -113,7 +113,7 @@ if [ -x "/usr/bin/llvm-config-$LLVM" ] && ! [ -f "/usr/bin/llvm-config" ]; then
         --slave /usr/bin/llvm-xray llvm-xray "/usr/bin/llvm-xray-$LLVM"
 fi
 
-if [ -x "/usr/bin/clang-$LLVM" ] && ! [ -f "/usr/bin/clang" ]; then
+if [[ -x "/usr/bin/clang-$LLVM" && ( ! -f "/usr/bin/clang" || $(update-alternatives --list clang) ) ]]; then
     # From https://gist.github.com/hcoona/4e6d681c054e8aa2b877f7363ca5d220
     update-alternatives --quiet \
         --install /usr/bin/clang clang "/usr/bin/clang-$LLVM" 10 \

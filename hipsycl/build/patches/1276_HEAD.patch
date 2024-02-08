@@ -1,16 +1,3 @@
-diff --git a/bin/acpp b/bin/acpp
-index 7d7db4cc..2dd39fc3 100755
---- a/bin/acpp
-+++ b/bin/acpp
-@@ -1987,7 +1987,7 @@ if __name__ == '__main__':
-       if not config.has_optimization_flag():
-         print("acpp warning: No optimization flag was given, optimizations are "
-               "disabled by default. Performance may be degraded. Compile with e.g. -O2/-O3 to "
--              "enable optimizations.")
-+              "enable optimizations.", file=sys.stderr)
-     
-     c = compiler(config)
-     sys.exit(c.run())
 diff --git a/cmake/syclcc-launcher b/cmake/syclcc-launcher
 index 41a626f8..37e884ff 100755
 --- a/cmake/syclcc-launcher

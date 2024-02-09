@@ -35,7 +35,7 @@ jobs:
                       ubuntu-version: "22.04"
                       platform: "intel"
                     - sycl: "dpcpp"
-                      sycl-version: "62ecb849"
+                      sycl-version: "89327e0a"
                       ubuntu-version: "22.04"
                       platform: "intel"
                     - sycl: "dpcpp"

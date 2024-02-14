@@ -65,11 +65,21 @@ case "$SYCL" in
         esac
         ;;
     dpcpp)
-        INTEL_COMPUTE_RT=23.22.26516.18
-        INTEL_IGC=1.0.14062.11
         case "$UBUNTU" in
-            22.04) ONEAPI_LEVEL_ZERO=1.11.0;;
-            *) ONEAPI_LEVEL_ZERO=1.9.9;;
+            22.04)
+                INTEL_COMPUTE_RT=23.52.28202.14
+                INTEL_IGC=1.0.15770.11
+                ONEAPI_LEVEL_ZERO=1.11.0
+                ;;
+            20.04)
+                INTEL_COMPUTE_RT=23.22.26516.18
+                INTEL_IGC=1.0.14062.11
+                ONEAPI_LEVEL_ZERO=1.9.9
+                ;;
+            *)
+                echo "I don't know which Intel CRT version to select for Ubuntu $UBUNTU" >&2
+                exit 1
+                ;;
         esac
         build-intel-compute-rt
         ;;

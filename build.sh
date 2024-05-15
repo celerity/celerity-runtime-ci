@@ -65,11 +65,17 @@ case "$SYCL" in
         esac
         ;;
     dpcpp)
-        INTEL_COMPUTE_RT=23.22.26516.18
-        INTEL_IGC=1.0.14062.11
         case "$UBUNTU" in
-            22.04) ONEAPI_LEVEL_ZERO=1.11.0;;
-            *) ONEAPI_LEVEL_ZERO=1.9.9;;
+            22.04)
+                INTEL_COMPUTE_RT=24.13.29138.7
+                INTEL_IGC=1.0.16510.2
+                ONEAPI_LEVEL_ZERO=1.17.0
+                ;;
+            *)
+                INTEL_COMPUTE_RT=23.22.26516.18
+                INTEL_IGC=1.0.14062.11
+                ONEAPI_LEVEL_ZERO=1.9.9
+                ;;
         esac
         build-intel-compute-rt
         ;;

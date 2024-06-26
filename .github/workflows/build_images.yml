@@ -35,11 +35,11 @@ jobs:
                       ubuntu-version: "22.04"
                       platform: "intel"
                     - sycl: "dpcpp"
-                      sycl-version: "89327e0a"
+                      sycl-version: "89327e0a" # pinned version for IDAG branch
                       ubuntu-version: "22.04"
                       platform: "intel"
                     - sycl: "dpcpp"
-                      sycl-version: "61e51015"
+                      sycl-version: "61e51015" # pinned version for legacy buffer_manager branch
                       ubuntu-version: "20.04"
                       platform: "intel"
                     - sycl: "hipsycl"
@@ -47,11 +47,15 @@ jobs:
                       ubuntu-version: "23.04"
                       platform: "nvidia"
                     - sycl: "hipsycl"
-                      sycl-version: "d2bd9fc7" # Keep in sync with build-lint job below!
+                      sycl-version: "2636e1ff" # pinned version for IDAG branch
                       ubuntu-version: "22.04"
                       platform: "nvidia"
                     - sycl: "hipsycl"
-                      sycl-version: "d2bd9fc7"
+                      sycl-version: "d2bd9fc7" # Keep in sync with build-lint job below! (pinned version for legacy buffer_manager branch)
+                      ubuntu-version: "22.04"
+                      platform: "nvidia"
+                    - sycl: "hipsycl"
+                      sycl-version: "d2bd9fc7" # pinned version for legacy buffer_manager branch
                       ubuntu-version: "20.04"
                       platform: "nvidia"
                     - sycl: "simsycl"

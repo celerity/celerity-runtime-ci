@@ -15,6 +15,7 @@ case "$DISTRIB_RELEASE" in
     20.04) LLVM=10 GCC=9;;
     22.04) LLVM=14 GCC=12;;
     23.04) LLVM=16 GCC=12;;
+    24.04) LLVM=18 GCC=13;;
     *) echo "Unsupported Ubuntu version $DISTRIB_RELEASE">&2; exit 1;;
 esac
 

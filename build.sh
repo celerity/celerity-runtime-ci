@@ -34,15 +34,16 @@ build-intel-compute-rt() {
         --tag "intel-compute-rt:$INTEL_COMPUTE_RT-ubuntu$UBUNTU" >&2
 }
 
+# TODO drop this once we have official CUDA 24.04 images
 build-cuda-dist-upgrade() {
-    if [ "$UBUNTU" != 23.04 ]; then
-        echo "I don't know the codename of Ubuntu $UBUNTU"
-        exit 1
-    fi
-
     UBUNTU_BASE=22.04
     FROM_CODENAME=jammy
-    TO_CODENAME=lunar
+
+    case "$UBUNTU" in
+        23.04) TO_CODENAME=lunar;;
+        24.04) TO_CODENAME=noble;;
+        *) echo "I don't know the codename of Ubuntu $UBUNTU"; exit 1;;
+    esac
 
     docker build cuda-dist-upgrade \
         --build-arg UBUNTU_BASE="$UBUNTU_BASE" \
@@ -60,21 +61,22 @@ case "$SYCL" in
         case "$UBUNTU" in
             20.04) CUDA=11.0.3;;
             22.04) CUDA=11.8.0;;
-            23.04) CUDA=12.2.0; build-cuda-dist-upgrade;;
+            23.04) CUDA=12.2.0; build-cuda-dist-upgrade;;  # legacy, TODO drop
+            24.04) CUDA=12.5.0; build-cuda-dist-upgrade;;
             *) echo "I don't know which CUDA version to select for Ubuntu $UBUNTU" >&2; exit 1;;
         esac
         ;;
     dpcpp)
         case "$UBUNTU" in
-            22.04)
-                INTEL_COMPUTE_RT=24.13.29138.7
-                INTEL_IGC=1.0.16510.2
-                ONEAPI_LEVEL_ZERO=1.17.0
-                ;;
-            *)
+            20.04)  # legacy, TODO drop
                 INTEL_COMPUTE_RT=23.22.26516.18
                 INTEL_IGC=1.0.14062.11
                 ONEAPI_LEVEL_ZERO=1.9.9
+                ;;
+            *)
+                INTEL_COMPUTE_RT=24.13.29138.7
+                INTEL_IGC=1.0.16510.2
+                ONEAPI_LEVEL_ZERO=1.17.0
                 ;;
         esac
         build-intel-compute-rt

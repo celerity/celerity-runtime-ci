@@ -2,7 +2,7 @@ ARG SYCL_IMAGE
 FROM ${SYCL_IMAGE}
 
 RUN bash /root/install-system.sh git ca-certificates lld gdb pkg-config \
-        libopenmpi-dev openmpi-bin libhdf5-openmpi-103 libhdf5-openmpi-dev \
+        libopenmpi-dev openmpi-bin libhdf5-openmpi-1* libhdf5-openmpi-dev \
         libc6-dbg libstdc++6-dbg python3 python3-pip curl lcov
 
 RUN curl -L https://coveralls.io/coveralls-linux.tar.gz | tar -xz -C /usr/local/bin

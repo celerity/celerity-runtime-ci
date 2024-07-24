@@ -59,7 +59,7 @@ jobs:
                       ubuntu-version: "23.04"  # old 'latest', TODO
                       platform: "nvidia"
                     - sycl: "hipsycl"
-                      sycl-version: "2636e1ff" # pinned version for IDAG branch
+                      sycl-version: "db000681" # pinned version for IDAG branch
                       ubuntu-version: "22.04"
                       platform: "nvidia"
                     - sycl: "hipsycl"

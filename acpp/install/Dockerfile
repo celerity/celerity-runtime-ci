@@ -18,9 +18,9 @@ COPY common/install-system.sh /root/install-system.sh
 RUN bash /root/install-system.sh cmake ccache clang clang-tidy libomp-dev \
         libboost-fiber-dev libboost-context-dev make python3
 
-COPY opt/hipsycl /opt/hipsycl
+COPY opt/acpp /opt/acpp
 COPY VERSION /VERSION
 
-ENV PATH="/opt/hipsycl/bin:${PATH}" \
+ENV PATH="/opt/acpp/bin:${PATH}" \
     CCACHE_DIR=/ccache \
     CCACHE_MAXSIZE=10G

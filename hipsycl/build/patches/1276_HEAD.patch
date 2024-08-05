@@ -1,9 +1,0 @@
-diff --git a/bin/acpp b/bin/acpp
-index 7428f229..7a3c2f0c 100755
---- a/bin/acpp
-+++ b/bin/acpp
-@@ -2043,3 +2043,4 @@ if __name__ == '__main__':
-   except Exception as e:
-     print_error("fatal: "+str(e))
-     sys.exit(-1)
-+# NOP: 1276 has been merged

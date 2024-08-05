@@ -3,7 +3,7 @@
 set -eu -o pipefail
 
 usage() {
-    echo "Usage: $0 [-f|--force] <ubuntu-version> hipsycl|dpcpp|simsycl <git-ref>" >&2
+    echo "Usage: $0 [-f|--force] <ubuntu-version> acpp|dpcpp|simsycl <git-ref>" >&2
     exit 1
 }
 
@@ -57,7 +57,7 @@ unset CUDA
 unset INTEL_COMPUTE_RT
 unset INTEL_IGC
 case "$SYCL" in
-    hipsycl)
+    acpp)
         case "$UBUNTU" in
             20.04) CUDA=11.0.3;;
             22.04) CUDA=11.8.0;;
@@ -182,7 +182,7 @@ build-sycl-from-source() {
 cd "$SYCL_DIR"
 case "$SYCL" in
     # run build-sycl-* functions in subshells to make `trap EXIT` work
-    hipsycl) (build-sycl-from-source "https://github.com/illuhad/hipSYCL.git");;
+    acpp) (build-sycl-from-source "https://github.com/AdaptiveCpp/AdaptiveCpp.git");;
     dpcpp) (build-sycl-from-source "https://github.com/intel/llvm.git");;
     simsycl) (build-sycl-from-source "https://github.com/celerity/simsycl.git");;
     *) usage;;
@@ -207,4 +207,4 @@ build-project-env() {
 
 cd "$ROOT_DIR"
 build-project-env celerity
-if [ "$UBUNTU" == 22.04 ] && [ "$SYCL" == hipsycl ]; then build-project-env ndzip; fi
+if [ "$UBUNTU" == 22.04 ] && [ "$SYCL" == acpp ]; then build-project-env ndzip; fi

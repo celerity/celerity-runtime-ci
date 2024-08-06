@@ -35,40 +35,16 @@ jobs:
                       ubuntu-version: "24.04"
                       platform: "intel"
                     - sycl: "dpcpp"
-                      sycl-version: "HEAD"
-                      ubuntu-version: "22.04"  # old 'latest' for legacy branch, TODO
-                      platform: "intel"
-                    - sycl: "dpcpp"
-                      sycl-version: "89327e0a" # pinned version for IDAG branch
+                      sycl-version: "89327e0a"
                       ubuntu-version: "22.04"
-                      platform: "intel"
-                    - sycl: "dpcpp"
-                      sycl-version: "61e51015" # pinned version for legacy buffer_manager branch
-                      ubuntu-version: "20.04"
                       platform: "intel"
                     - sycl: "acpp"
                       sycl-version: "HEAD"
                       ubuntu-version: "24.04"
                       platform: "nvidia"
                     - sycl: "acpp"
-                      sycl-version: "2dde43be" # TODO workaround for broken hipsycl head, remove
-                      ubuntu-version: "24.04"
-                      platform: "nvidia"
-                    - sycl: "acpp"
-                      sycl-version: "HEAD"
-                      ubuntu-version: "23.04"  # old 'latest', TODO
-                      platform: "nvidia"
-                    - sycl: "acpp"
-                      sycl-version: "db000681" # pinned version for IDAG branch
+                      sycl-version: "v24.06.0"
                       ubuntu-version: "22.04"
-                      platform: "nvidia"
-                    - sycl: "acpp"
-                      sycl-version: "d2bd9fc7" # Keep in sync with build-lint job below! (pinned version for legacy buffer_manager branch)
-                      ubuntu-version: "22.04"
-                      platform: "nvidia"
-                    - sycl: "acpp"
-                      sycl-version: "d2bd9fc7" # pinned version for legacy buffer_manager branch
-                      ubuntu-version: "20.04"
                       platform: "nvidia"
                     - sycl: "simsycl"
                       sycl-version: "HEAD"
@@ -106,7 +82,7 @@ jobs:
         runs-on: [ self-hosted, slurm ]
         env:
             sycl: "acpp"
-            sycl-version: "d2bd9fc7" # Keep in sync with build-sycl job above!
+            sycl-version: "v24.06.0" # Keep in sync with build-sycl job above!
             ubuntu-version: "22.04"  # TODO upgrade to 24.04
         permissions:
             packages: write

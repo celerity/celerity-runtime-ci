@@ -61,19 +61,24 @@ jobs:
               run: bash ./build.sh -f ${{ matrix.ubuntu-version }} ${{ matrix.sycl }} ${{ matrix.sycl-version }}
               if: ${{ github.event_name != 'schedule' }}
             # NOTE: Since `docker login` is stateful, we race with other jobs that run concurrently on the same machine, which may
-            #       result in spurious authentication failures. We reduce the likelihood of this by logging in right before pushing.
-            - name: Log into Container registry
-              uses: docker/login-action@v3
-              with:
-                registry: ghcr.io
-                username: ${{ github.actor }}
-                password: ${{ secrets.GITHUB_TOKEN }}
+            #       result in spurious authentication failures. We re-try several times before giving up.
             - name: Push Docker containers for ${{ matrix.sycl }} ${{ matrix.sycl-version }} on ${{ matrix.ubuntu-version }}
               run: |
                 for REPOSITORY in "${{ matrix.sycl }}" "celerity-build/${{ matrix.sycl }}"; do
                   IMAGE="$REPOSITORY:ubuntu${{ matrix.ubuntu-version }}-${{ matrix.sycl-version }}"
                   docker tag $IMAGE ghcr.io/celerity/$IMAGE
-                  docker push ghcr.io/celerity/$IMAGE
+                  ATTEMPTS=0
+                  SUCCESS=0
+                  while [[ $SUCCESS -ne 1 && $ATTEMPTS -lt 5 ]]; do
+                      docker login -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} ghcr.io
+                      { docker push ghcr.io/celerity/$IMAGE && SUCCESS=1; } || true
+                      sleep $(( (2 ** ATTEMPTS) - 1 ))
+                      ATTEMPTS=$(( ATTEMPTS + 1 ))
+                  done
+                  if [[ $SUCCESS -ne 1 ]]; then
+                    echo "Failed to push Docker image"
+                    exit 1
+                  fi
                 done
     build-lint:
         needs: [check-prerequisites]

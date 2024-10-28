@@ -91,8 +91,6 @@ jobs:
             packages: write
         steps:
             - uses: actions/checkout@v4
-            - name: Build Celerity linting container
-              run: bash ./build-lint.sh ${{ env.ubuntu-version }} ${{ env.sycl }} ${{ env.sycl-version }}
             # Same concurrency concerns as above.
             - name: Log into Container registry
               uses: docker/login-action@v3
@@ -100,6 +98,8 @@ jobs:
                 registry: ghcr.io
                 username: ${{ github.actor }}
                 password: ${{ secrets.GITHUB_TOKEN }}
+            - name: Build Celerity linting container
+              run: bash ./build-lint.sh ${{ env.ubuntu-version }} ${{ env.sycl }} ${{ env.sycl-version }}
             - name: Push Celerity linting container
               run: |
                 docker tag celerity-lint:latest ghcr.io/celerity/celerity-lint:latest

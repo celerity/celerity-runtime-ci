@@ -21,6 +21,8 @@ RUN bash /root/install-system.sh cmake ccache clang clang-tidy libomp-dev \
 COPY opt/acpp /opt/acpp
 COPY VERSION /VERSION
 
+# CCACHE_DEPEND=1 works around https://github.com/ccache/ccache/issues/1488
 ENV PATH="/opt/acpp/bin:${PATH}" \
     CCACHE_DIR=/ccache \
+    CCACHE_DEPEND=1 \
     CCACHE_MAXSIZE=10G
